@@ -9,7 +9,7 @@ type:          item | spell | entity
 content_id:    <snake_case>            # literal registry id == the code name
 modid:         <snake_case>            # target jar (isekai_beasts | mahoumagicule | ...)
 display_name:  "Title Case"
-build_target:  vanilla_codemodel | geckolib | datagen_only | event_handler | none
+build_target:  vanilla_codemodel | geckolib | datagen_only | event_handler | custom_mesh | none
 host:          none | irons_spells | ars_nouveau | psi | mahoutsukai | tensura
 spec:          { lane-specific — see lanes/*.md }
 verify:        [ acceptance checks; at least one in-game ]
@@ -22,6 +22,8 @@ verify:        [ acceptance checks; at least one in-game ]
   wanted. GeckoLib 4.8.4 is present in the pack.
 - `datagen_only` — pure data (recipes, loot, tags, simple items). No Java behaviour.
 - `event_handler` — no asset; a NeoForge/mixin handler (most `spell` integration, economy hooks).
+- `custom_mesh` — free-form triangle mesh via a custom renderer (escape hatch; leaves the grid +
+  skeletal-animation workflow — see `core/texture-grid.md` §7). Reserve for VFX / hero one-offs.
 - `none` — config/datapack only.
 
 ## AXES — the axiom that prevents the 180° spin

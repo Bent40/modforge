@@ -20,7 +20,8 @@ deliverable, and an NPC block on top of the shared spine. `build_target: vanilla
 
 `quadruped` · `biped` · `serpentine` · `avian` · `blob` · `humanoid_npc`
 
-A new entity selects an archetype and customises it — it does not re-derive a bone tree.
+A new entity selects an archetype and customises it — it does not re-derive a bone tree. Each
+archetype's standard bone tree + locators + gait defaults are in `core/archetypes.md`.
 
 ## spec body
 

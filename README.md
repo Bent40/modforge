@@ -25,9 +25,12 @@ modforge/
   README.md            ← this file (overview + the shared envelope)
   CLAUDE.md            ← agent quick-start
   core/
-    spec-envelope.md   ← the shared SpecBlock + every shared convention (READ FIRST).
-                          Palette, reject, and verification rules are consolidated here.
+    spec-envelope.md   ← the shared SpecBlock + every shared convention (READ FIRST)
+    palette.md         ← the color contract (roles, hex, emissive, per-content vocab)
     texture-grid.md    ← per-surface palette-index textures; the build owns the UV
+    archetypes.md      ← rig templates (quadruped / biped / serpentine / avian / blob / npc)
+    reject-checklist.md← shared + per-lane rejects, in one place
+    verification.md    ← positive acceptance criteria + geometry self-checks
   lanes/
     item.md            ← item lane: deliverables + spec schema + worked example
     spell.md           ← spell lane: cast + effect + VFX + entity + integration
@@ -45,7 +48,7 @@ type:          item | spell | entity
 content_id:    <snake_case>            # the literal registry id AND the code name
 modid:         <snake_case>            # which jar it lands in
 display_name:  "Title Case"
-build_target:  vanilla_codemodel | geckolib | datagen_only | event_handler | none
+build_target:  vanilla_codemodel | geckolib | datagen_only | event_handler | custom_mesh | none
 host:          none | irons_spells | ars_nouveau | psi | mahoutsukai | tensura
 spec:          { ...lane-specific body... }
 verify:        [ acceptance checks, including in-game ]
