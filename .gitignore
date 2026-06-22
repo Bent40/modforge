@@ -1,0 +1,14 @@
+# Modforge — design system (markdown + future React components)
+
+# tooling / build output (for the components kit)
+node_modules/
+dist/
+build/
+*.log
+*.tsbuildinfo
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
