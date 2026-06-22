@@ -4,18 +4,15 @@ A design language and handoff system for designing **mod content** that hands of
 Target stack: NeoForge 1.21.1. Build targets: vanilla code-model / GeckoLib / datagen / event-handler.
 Default geometry: **rotated cuboids** — low-poly silhouettes that keep the grid-texture + skeletal-animation workflow.
 
-Modforge is the evolution of **Mobforge**: the same visual system, the same standing-rules
-philosophy, generalized from "mobs only" to **three content lanes**:
+Modforge covers three content **lanes**, each with its own spec schema over one shared envelope:
 
 | lane     | makes                                   | worked example       |
 |----------|-----------------------------------------|----------------------|
 | `item`   | items, tools, trinkets, blocks-as-items | `cooling_ember_core` |
 | `spell`  | spells, abilities, projectile/beam VFX  | `skyfall_lance`      |
-| `entity` | mobs + NPCs (the old Mobforge)          | `cinderkit`          |
+| `entity` | mobs and NPCs                           | `cinderkit`          |
 
-Mobs are no longer the whole system — they are the `entity` lane.
-
-## The one rule everything still serves
+## The one rule everything serves
 
 **The image is NOT the handoff — the paired spec block is.** Claude Code reads text, not pictures.
 Every visual deliverable ships alongside a structured, machine-readable **SpecBlock** (see
@@ -25,19 +22,18 @@ Every visual deliverable ships alongside a structured, machine-readable **SpecBl
 
 ```
 modforge/
+  README.md            ← this file (overview + the shared envelope)
+  CLAUDE.md            ← agent quick-start
   core/
-    spec-envelope.md   ← the shared SpecBlock + every shared convention (READ FIRST)
-    palette.md         ← palette-as-schema (roles, hex, emissive)            [shared]
-    texture-grid.md    ← per-surface palette-index matrices, build owns UV   [shared]
-    reject-checklist.md← shared rejects + per-lane rejects                   [shared]
-    verification.md    ← positive acceptance criteria + in-game checks       [shared]
+    spec-envelope.md   ← the shared SpecBlock + every shared convention (READ FIRST).
+                          Palette, reject, and verification rules are consolidated here.
+    texture-grid.md    ← per-surface palette-index textures; the build owns the UV
   lanes/
-    item.md            ← item lane: deliverables + spec schema + example
+    item.md            ← item lane: deliverables + spec schema + worked example
     spell.md           ← spell lane: cast + effect + VFX + entity + integration
     entity.md          ← entity lane: model + rig + motion + behaviour + npc
-  examples/
-    cinderkit/  skyfall_lance/  cooling_ember_core/      ← full worked sheets
-  SKILL.md             ← makes this folder a downloadable Claude Skill
+  components/  (planned) ← React kit: TextureGrid, ItemSprite, SpellBoard, SpecBlock lane-switch
+  examples/    (planned) ← full worked sheets: cinderkit, skyfall_lance, cooling_ember_core
 ```
 
 Every lane inherits the spine. The spine never repeats itself per lane.
@@ -68,10 +64,10 @@ One parser, one envelope, three `spec` bodies. Full field reference in `core/spe
 
 Design one thing, reference it everywhere. Variants reuse, never redraw.
 
-## What changed from Mobforge (the fixes from the first real build)
+## Four rules the spine enforces (each prevents a real failure)
 
-The Cinderkit shipped, but four classes of bug cost most of the iterations. Each is now a
-**spine-level rule**, not a thing the designer remembers:
+These aren't style preferences. Each is a class of bug that cost real rebuilds when building actual
+content, now lifted into a **spine-level rule** so the designer never has to remember it:
 
 1. **Orientation is an axiom.** Author in Minecraft's frame (forward = −Z). No 180° spin, no
    sign-flip cascade. Hard reject if the head isn't at the most-negative Z. (`core/spec-envelope.md`)
@@ -83,7 +79,7 @@ The Cinderkit shipped, but four classes of bug cost most of the iterations. Each
    noise + a UV/texOffs desync. Now: palette-index matrices per face, build packs the atlas.
    (`core/texture-grid.md`)
 
-## Naming is sacred (unchanged, now lane-wide)
+## Naming is sacred
 
 snake_case, ASCII, starts with a letter, no caps, no spaces. The label on the diagram IS the code
 name: `cinderkit`, `skyfall_lance`, `cooling_ember_core`, `leg_front_left_upper`, `locator_muzzle`.

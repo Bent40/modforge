@@ -1,8 +1,8 @@
 # lane / entity
 
-Mobs and NPCs — the old Mobforge, generalized. Adds the orientation axiom, first-class pivots, a
-**behaviour** deliverable, and an NPC block. `build_target: vanilla_codemodel` (default, proven) or
-`geckolib`.
+Mobs and NPCs. The entity lane adds the orientation axiom, first-class pivots, a **behaviour**
+deliverable, and an NPC block on top of the shared spine. `build_target: vanilla_codemodel`
+(default, proven) or `geckolib`.
 
 ## Deliverables (bundle)
 
