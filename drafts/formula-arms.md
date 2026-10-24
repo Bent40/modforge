@@ -426,9 +426,7 @@ Decided by Ben, 2026-10-24:
 1. **Psi first**, with the payload seam.
 2. **Both round modes:** disposable rounds, plus conjured (infinite) rounds at 3x the cost modifier.
 3. **Type 95 at 4x** (efficiency 25).
-4. **Flight:** "maybe". Ben recalls a flight device with the orb as a booster; the fan sources found say the orb
-   itself runs the flight formula. Kept as orb flight in this draft; the alternative is a `flight_harness` curio
-   that flies, with the orb tier boosting its speed and ceiling. Still open.
+4. **Flight from the orb** (decided 2026-10-24, after weighing a separate flight harness).
 5. **Phase 6.**
 
 ## 10. Open checks before building
