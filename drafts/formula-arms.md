@@ -38,7 +38,8 @@ Strength key: **[S]** primary/strong (Wikipedia citing the novels/anime), **[F]*
 | Prayer gates the big spells | Tanya says a short prayer before powerful spells; the orb won't produce the needed power without it | [F] TV Tropes, Characters |
 | The cost of prayer: mental contamination | Each use erodes her atheist persona, blackouts; gold eyes, boosted capacity and accuracy, a high-tier explosive formula while praying; a **rosary** keeps the corruption from becoming permanent | [F] TV Tropes + Youjo Senki wiki (Tanya page) |
 | The 203rd: fast elite aerial battalion | "Elite mages whose main purpose is to overwhelm enemy forces" while mobile | [S] Wikipedia |
-| Altitude as a power ladder | Standard mages hit a ceiling around 6,000 ft; the Type 95 test flight goes far above it | [R] anime episodes 1-2, not re-verified |
+| Altitude as a power ladder | Normal mages top out around 8,000 ft, elites near 10,000 ft (dub/sub mix feet and metres); the Type 95 test flight goes far above it | [F] r/YoujoSenki altitude thread; [R] anime episodes 1-2 |
+| The orb runs the flight formula | Fan sources describe the orb as the tool aerial mages run their flight formulas through; no separate flight device is described (leg-mounted flight units are *Strike Witches*, not Tanya) | [F] Youjo Senki wiki (Operation Orb) + TechTimes season-2 piece |
 | Mana signatures give mages away | Enemy forces track mages by their mana signal | [R] anime, not re-verified |
 
 Unit note: one fan page and Wikipedia disagree on 203rd vs 205th in places; it doesn't affect the design.
@@ -242,8 +243,12 @@ verify:
 
 ### 6.3 Round types (the "special pellets")
 
-Consumable, stack 64, cheap to craft (iron nugget + gunpowder + a pinch of magic crystal). They carry **no
-magicule**; the formula's magicule is the only cost. (`consume_rounds` is a config toggle; off = infinite.)
+**Two ways to feed a gun (Ben, 2026-10-24: both):**
+- **Disposable rounds** (default): consumable, stack 64, cheap to craft (iron nugget + gunpowder + a pinch of
+  magic crystal). They carry **no magicule**; the formula's magicule is the only cost.
+- **Conjured rounds** (infinite): with no matching round in the inventory, sneak-use toggles the gun to conjure the
+  round from magicule. Same behaviour, but the round's cost modifier is multiplied by **`conjured_round_multiplier`
+  = 3.0** (so a ball round goes from 1.02 to 3.06). Convenience paid in magicule, never free.
 
 | content_id | Gun | Behaviour | Formula runs | Cost modifier (vs Psi's spell cost) |
 |---|---|---|---|---|
@@ -302,8 +307,8 @@ type: item   content_id: type_95_elinium_orb   modid: formula_arms
 display_name: "Elinium Type 95 Computation Orb"   build_target: vanilla_codemodel   host: psi
 spec:
   item_type: material            # a CAD assembly with behaviour
-  cad_component: { type: assembly, model: "formula_arms:item/cad_type_95", stats: { efficiency: 50, potency: 800 } }
-  # efficiency 50 = every formula costs 2x (lore says 4x; 2x keeps it usable, tunable to 25 for 4x)
+  cad_component: { type: assembly, model: "formula_arms:item/cad_type_95", stats: { efficiency: 25, potency: 800 } }
+  # efficiency 25 = every formula costs 4x, the lore's quadrupled consumption (Ben, 2026-10-24)
   # potency 800 = more than twice ebony: spells no other CAD can compile
   prayer_gate:
     applies_when: "spell potency > 350 (beyond any normal CAD)"   # small spells work without praying
@@ -408,20 +413,23 @@ Phase 6 expansion window ("Formula Arms"), with two things that should happen so
 | Shotgun | 2 sockets, 6 pellets, 7.5 deg spread, cooldown 24 t, 3/pellet, slug 10 | |
 | Airburst fuse | 24 blocks (8 to 64) | |
 | Type 97 | efficiency 88, potency 300 | between psimetal and ebony |
-| Type 95 | efficiency 50, potency 800 | efficiency 25 = the lore's 4x cost |
+| Type 95 | efficiency 25, potency 800 | 4x cost, as in the source |
 | Prayer | potency > 350 needs it; 3 s channel; 60 s window | |
 | Contamination | +4 per overclocked cast, -2/min, thresholds 25/60/90 | rosary halves gain, caps at 89 |
 | Flight | 25 / 60 magicule/s; speed 0.08 / 0.13; ceiling Y 200 / 320 | |
-| `consume_rounds` | true | false = infinite rounds |
+| `conjured_round_multiplier` | 3.0 | cost multiplier when the gun conjures its own round |
 | Mana signature | off | Glowing after big shots |
 
 ## 9. Decisions for Ben
 
-1. **Psi-only first with a payload seam (recommended), or the full carrier up front?** Recommended: Psi first.
-2. **Consumable rounds (recommended) or infinite rounds?** Rounds make "special pellets" a real choice.
-3. **Type 95 cost: 2x (recommended, playable) or the lore's 4x?**
-4. **Flight from the orb (recommended), or leave flight to races and Psi's own motion tricks?**
-5. **Slot it as Phase 6 with P1 pullable forward (recommended), or earlier?**
+Decided by Ben, 2026-10-24:
+1. **Psi first**, with the payload seam.
+2. **Both round modes:** disposable rounds, plus conjured (infinite) rounds at 3x the cost modifier.
+3. **Type 95 at 4x** (efficiency 25).
+4. **Flight:** "maybe". Ben recalls a flight device with the orb as a booster; the fan sources found say the orb
+   itself runs the flight formula. Kept as orb flight in this draft; the alternative is a `flight_harness` curio
+   that flies, with the orb tier boosting its speed and ceiling. Still open.
+5. **Phase 6.**
 
 ## 10. Open checks before building
 
