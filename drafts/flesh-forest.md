@@ -66,8 +66,8 @@ Two players standing side by side can see different worlds, and neither can chea
 
 Why this shape:
 - No fake block swapping, no per-player chunk packets, no server state that can desync. One flag per client.
-- Disguised mobs reuse vanilla models and textures (wolf, villager, allay), so the illusion layer costs almost no
-  art: only the true forms need palette grids.
+- The hound and puppet disguises reuse vanilla models and textures (wolf, villager), so most of the illusion layer
+  costs no art. The fairy is custom in both forms, drawn from Ben's sketches (7.2).
 - Every illusory block is a flesh block paired with a vanilla "twin" block whose model it borrows, so the forest
   looks exactly like vanilla flora until it doesn't.
 
@@ -147,7 +147,7 @@ Client side (`client` package, `Dist.CLIENT`):
 - **Sound:** biome ambient = birds. Pierced clients start a looping heartbeat `SoundInstance` and duck the biome
   ambience.
 - **Mobs:** each disguised entity's renderer holds two models: the vanilla disguise (`WolfModel`, `VillagerModel`,
-  `AllayModel` with a tint) and the true code model. `render()` picks by tier. Cave mobs render translucent at
+  the custom `fairy_glamour` model) and the true code model. `render()` picks by tier. Cave mobs render translucent at
   `stalker_alpha` (0.15 deceived, 0.45 uneasy, 1.0 lucid/pierced) plus a faint shimmer particle.
 - **Items:** glamoured items carry an item property `isekai_wilds:glamoured` (1 while the local tier is below
   `pierced`); the item model JSON overrides to the twin's model (diamond, gold ingot, emerald). Pure data.
@@ -187,7 +187,7 @@ type: datagen + event_handler   content_id: flesh_forest   modid: isekai_wilds  
 placement: TerraBlender overworld region, weight 2 (rare), temperature 0.6-0.9, humidity 0.6-1.0, low erosion
 features: flesh trees (twin oak/flowering azalea), pustule blooms (twin allium/peony/cornflower),
           vein vines (twin vine), ore spires (part of the warren structure, see 6.3)
-spawns:   flesh_hound (pack 2-4), pore_moth (3-6), surface monster cap off (no zombies: the paradise is quiet)
+spawns:   flesh_hound (pack 2-4), heartling (3-6), surface monster cap off (no zombies: the paradise is quiet)
 effects:  sky #9fd6ff, fog #d9f2ff, water #3fd8e8, grass/foliage vivid  (the glamour)
 magicule: kubejs/data/isekai_wilds/biome_magicule/flesh_forest.json  ADD 3000, regen ADD 15
 ```
@@ -267,10 +267,22 @@ M     pustule_glow  #ff5a6e   emissive  pulsing nodes (always over a base cell)
 B     bile_glow     #c6e04a   emissive  bile sacs, bile projectiles
 Y     eye_glow      #ffe9a8   emissive  lidless eyes, heart valve
 ```
-Disguise tint role (fairy glamour, multiplies the vanilla allay texture):
+Added for the heartling (7.2):
 ```
-g     fairy_tint    #ffb3e6   base      renderer colour multiplier on AllayModel
+r     blood         #7a0f1c   base      drips
+m     membrane      #2a0a12   base      wing membrane
 ```
+
+### 7.0b Palette `fairy_glamour` (the heartling's disguise only)
+```
+token id            hex       layer     note
+.     transparent   -         -
+W     orb_core      #ffffff   emissive  fairy light (always over w)
+C     orb_glow      #bff4ff   emissive  orb rim, halo
+w     wing_pale     #e6fbff   base      leaf wings (rendered translucent)
+v     wing_vein     #a8d8e8   base      leaf veins
+```
+Per-entity tint variants multiply the whole model: cyan `#9ff0ff`, pink `#ffb3e6`, gold `#ffe28a`.
 
 ### 7.1 `flesh_hound` (disguise: wolf)
 ```
@@ -328,48 +340,92 @@ verify:
   - death message names a "Flesh Hound"; killing it grants Tensura EP
 ```
 
-### 7.2 `pore_moth` (disguise: fairy)
+### 7.2 `heartling` (disguise: fairy) — from Ben's sketches, 2026-10-24
+Ben's two style references (`/mnt/project-files/design/flesh-forest/reference/`): the **glamour** is a glowing orb
+fairy with two large leaf wings swept up and out, two small leaf wings below, and a trail of sparkle dots. The
+**true form** is an anatomical heart with an aorta and vessel stubs on top, sinew spines fanning up and out like
+wing bones, a dark spiked membrane hanging under the spines, and blood dripping from the apex. Lore: heartlings
+are buds of The Grove's Heart, which is why the forest's "fairies" lead you down to it. When the heart dies,
+heartlings within 64 blocks wither.
+
+Both forms are custom models (Ben, 2026-10-24). **The wings share pivots**: the fairy's upper wings and the
+heartling's spines hinge at the same points, so a corner-of-the-eye glimpse (5.1) swaps the form inside the same
+silhouette. Concept render: `drafts/flesh-forest-fairy.png` (rest rotations applied, intent signs).
+
 ```
-type: entity   content_id: pore_moth   modid: isekai_wilds   build_target: vanilla_codemodel
-display_name: "Pore Moth"   glamour_name: "Fairy"   host: none
+type: entity   content_id: heartling   modid: isekai_wilds   build_target: vanilla_codemodel
+display_name: "Heartling"   glamour_name: "Fairy"   host: none
 spec:
   archetype: avian
   axes: { forward: -Z, up: +Y, right: +X }
-  disguise: { model: vanilla AllayModel, texture: minecraft:textures/entity/allay/allay.png, tint: fairy_tint, particle: glow_spark_pink }
-  model:
+  disguise:
+    model: fairy_glamour (custom code model below, palette fairy_glamour, rendered translucent + full-bright)
+    tint_variants: [ cyan #9ff0ff, pink #ffb3e6, gold #ffe28a ]   # renderer colour multiplier, picked per entity
+    halo: billboard 12x12 px glow sprite at locator_core, emissive, alpha 0.5
+    particle: fairy_trail (4-6 dots falling behind, the sketch's sparkle trail)
     cuboids:
-      - { bone: body,          size:[3,5,2], offset:[-1.5,4,-1],    pivot:[0,6.5,0],   rot:[0,0,0],    parent: everything }
-      - { bone: head,          size:[4,4,4], offset:[-2,9,-2.5],    pivot:[0,9,0],     rot:[0,0,0],    parent: body }
-      - { bone: wing_left,     size:[8,6,0], offset:[-9.5,5,0.5],   pivot:[-1.5,8,0.5], rot:[0,-20,-10], parent: body }   # membrane, swept back and down
-      - { bone: wing_right,    size:[8,6,0], offset:[1.5,5,0.5],    pivot:[1.5,8,0.5], rot:[0,20,10],  parent: body }
-      - { bone: leg_left,      size:[1,4,1], offset:[-1,0,-0.5],    pivot:[-0.5,4,0],  rot:[0,0,0],    parent: body }    # dangling tendril
-      - { bone: leg_right,     size:[1,4,1], offset:[0,0,-0.5],     pivot:[0.5,4,0],   rot:[0,0,0],    parent: body }
-    self_checks: [ "tendril tips at y=0", "head sits on body top y=9", "most-negative Z = head at -2.5" ]
+      - { bone: orb,              size:[4,4,4],  offset:[-2,6,-2],     pivot:[0,8,0],      rot:[0,0,0],   parent: everything }
+      - { bone: orb_facet,        size:[4,4,4],  offset:[-2,6,-2],     pivot:[0,8,0],      rot:[0,0,45],  parent: orb }     # rounds the orb's silhouette
+      - { bone: wing_upper_left,  size:[4,10,0], offset:[-5.5,9,0.5],  pivot:[-2,9.5,0.5], rot:[0,0,48],  parent: orb }     # swept up and out
+      - { bone: wing_upper_right, size:[4,10,0], offset:[1.5,9,0.5],   pivot:[2,9.5,0.5],  rot:[0,0,-48], parent: orb }
+      - { bone: wing_lower_left,  size:[2,4,0],  offset:[-3.5,3.5,0.5],pivot:[-2,7,0.5],   rot:[0,0,-62], parent: orb }     # small, down and out
+      - { bone: wing_lower_right, size:[2,4,0],  offset:[1.5,3.5,0.5], pivot:[2,7,0.5],    rot:[0,0,62],  parent: orb }
+    texture:
+      orb.north / orb_facet.north: { base: grid:fairy_orb_north, emissive: grid:fairy_orb_north_emissive }   other orb faces: same grid
+      wing_upper_*.north: { base: grid:fairy_wing_upper_north }   (south = mirror)
+      wing_lower_*.north: { base: grid:fairy_wing_lower_north }
+    motion: { flap: "upper wings rot z +/-20 at 8 Hz, lower wings +/-12 in counter-phase", bob: "orb y +/-0.75 px at 1 Hz" }
+  model:            # the TRUE form
+    cuboids:
+      - { bone: heart,         size:[5,6,4],  offset:[-2.5,5,-2],    pivot:[0,8,0],      rot:[0,0,-12], parent: everything }  # anatomical tilt
+      - { bone: apex,          size:[3,2,3],  offset:[-1.5,3.5,-1.5],pivot:[0,5,0],      rot:[0,45,0],  parent: heart }
+      - { bone: atrium_left,   size:[2,2,3],  offset:[-3,10.5,-1.5], pivot:[-2,11,0],    rot:[0,0,0],   parent: heart }
+      - { bone: atrium_right,  size:[2,2,3],  offset:[1,10.5,-1.5],  pivot:[2,11,0],     rot:[0,0,0],   parent: heart }
+      - { bone: aorta,         size:[2,3,2],  offset:[-1,11,-0.5],   pivot:[0,11,0.5],   rot:[-25,0,0], parent: heart }      # arches back
+      - { bone: vessel_left,   size:[1,2,1],  offset:[-2.5,12.5,0],  pivot:[-2,12.5,0.5],rot:[0,0,20],  parent: heart }
+      - { bone: vessel_right,  size:[1,2,1],  offset:[1.5,12.5,0],   pivot:[2,12.5,0.5], rot:[0,0,-20], parent: heart }
+      - { bone: drip_a,        size:[1,3,1],  offset:[-1,1.5,-1],    pivot:[-0.5,4.5,-0.5], rot:[0,0,0], parent: heart }     # scale-Y stretch anim
+      - { bone: drip_b,        size:[1,2,1],  offset:[1,2.5,-0.5],   pivot:[1.5,4.5,0],  rot:[0,0,0],   parent: heart }
+      - { bone: spine_left_1,  size:[1,13,1], offset:[-3,9.5,0],     pivot:[-2.5,10,0.5],rot:[0,0,18],  parent: everything } # wing bones fan up and out
+      - { bone: spine_left_2,  size:[1,12,1], offset:[-3,9,0],       pivot:[-2.5,9.5,0.5],rot:[0,0,38], parent: everything }
+      - { bone: spine_left_3,  size:[1,10,1], offset:[-3,8.5,0],     pivot:[-2.5,9,0.5], rot:[0,0,58],  parent: everything }
+      - { bone: membrane_left, size:[7,7,0],  offset:[-9.5,3,1.5],   pivot:[-2.5,9,1.5], rot:[0,0,28],  parent: everything } # spiked, hangs under the spines
+      - { mirror: "spine_right_1..3 and membrane_right = mirror of the left set across X (offset x -> -x-w, pivot x -> -x, rot z -> -z)" }
+    self_checks:
+      - "drip_a tip at y=1.5 is the lowest point (flyer: hovers ~0.5 block up, no feet)"
+      - "front (most-negative Z) = heart north face at z=-2, carrying the eye"
+      - "spine pivots within 0.5 px of the fairy's upper-wing pivots (shared silhouette)"
   texture:
-    head.north: { base: grid:pore_moth_head_north, emissive: grid:pore_moth_head_north_emissive }
-    head.other: solid p   body.*: solid p   wings: solid d (pending: vein tracery v)   legs: solid s
-  rig: { bones: avian(everything, body, head, wing_left, wing_right, leg_left, leg_right), locators: [ {id: locator_beak, on_bone: head, pos:[0,10.5,-2.5]} ] }
+    heart.north: { base: grid:heartling_heart_north, emissive: grid:heartling_heart_north_emissive }   # the sketch's eye
+    heart.other: solid f   apex: solid d   atria: solid p   aorta: solid f   vessels: solid v
+    spines: solid s (tips b, pending)   membrane_*.north: { base: grid:heartling_membrane_north }   drips: solid r
+  rig: { bones: avian(everything, heart, spine_*, membrane_*), locators: [ {id: locator_beak, on_bone: aorta, pos:[0,14,0]}, {id: locator_core, on_bone: heart, pos:[0,8,0]} ] }
   motion:
-    rest_pose: [ {bone: wing_left, rot:[0,-20,-10]}, {bone: wing_right, rot:[0,20,10]} ]
-    anims: [ {name: flap, type: loop}, {name: spit, type: once, particle_keys:[bile_glow@locator_beak]} ]
+    rest_pose: [ {bone: heart, rot:[0,0,-12]}, {bone: spine_left_1, rot:[0,0,18]}, {bone: spine_left_2, rot:[0,0,38]}, {bone: spine_left_3, rot:[0,0,58]}, {bone: membrane_left, rot:[0,0,28]} ]
+    anims: [ {name: beat, type: loop, note: "heart scale 1.0 -> 1.1 -> 1.0, 70 bpm; drips stretch on the beat"},
+             {name: flap, type: loop, note: "spines + membrane rot z +/-15 at 4 Hz (slower, heavier than the fairy)"},
+             {name: spit, type: once, particle_keys:[blood@locator_beak]} ]
   behaviour:
     attributes: { max_health: 10, flying_speed: 0.5, movement_speed: 0.25, follow_range: 32 }
     ai_goals:
       - {priority: 1, goal: lure_lead, params:{ only_tiers:[deceived, uneasy], flying: true, lead_ahead: 5-8, wait_radius: 12 }}
-      - {priority: 2, goal: ranged_spit, params:{ ability: bile_dart, range: 4-16, cd: 40-60 }}
+      - {priority: 2, goal: ranged_spit, params:{ ability: blood_dart, range: 4-16, cd: 40-60 }}
       - {priority: 4, goal: flee_when_close, params:{ under: 3 }}
       - {priority: 6, goal: hover_wander}
     ai_rule: "no melee at all; ranged spit (2) is its only attack; it flees under 3 blocks"
     targeting: [ {goal: nearest_player, params:{ tiers:[lucid, pierced] }}, {goal: nearest_player, params:{ inside_warren: true }} ]
     spawn: { category: ambient, biomes: [isekai_wilds:flesh_forest], weight: 14, pack: 3-6, placement: no_restrictions }
     tameable: none
-    abilities: [ bile_dart ]
+    abilities: [ blood_dart ]
+    on_heart_death: wither within 64 blocks
     tensura: { can_be_named: false, entity_existence_ep: 600 }
   npc: none
 verify:
-  - deceived client sees a pink-tinted allay-like fairy with sparkles; pierced client sees the pore moth
+  - deceived client sees a glowing orb fairy (cyan, pink or gold) with four leaf wings and a falling sparkle trail
+  - pierced client sees the winged heart: spines fanned up, membrane below, drips, the eye glowing on the front
+  - a glimpse swaps fairy -> heartling for 3 frames with the wings in the same place
   - fairies drift 5-8 blocks ahead toward a pore mouth and wait at the entrance
-  - against a pierced player it spits bile darts from range and never melees
+  - against a pierced player it spits blood darts from range and never melees
 ```
 
 ### 7.3 `skin_puppet` (disguise: villager)
@@ -542,7 +598,7 @@ EP 5000). `blood_clot` (blob, `core` 6x5x6 at [-3,0,-3], solid f; 12 HP, melee o
 | content_id | cast_type | numbers (defaults) |
 |---|---|---|
 | `tendon_lunge` | leap_strike | 3-8 blocks, 10 dmg, 1 s slow on hit |
-| `bile_dart` | projectile | 4 dmg + Poison I 4 s; VFX `bile_glow` |
+| `blood_dart` | projectile | 4 dmg + Wither I 3 s; VFX `blood` + `pustule_glow` |
 | `grasping_hold` | grab | 1.5-3 blocks, roots 2 s, 3 dmg/s |
 | `tendril_lash` | pull_line | 3-10 blocks, 8 dmg, pulls target to 2 blocks |
 | `bile_drop` | lobbed_aoe | 6-24 blocks, 3x3 acid puddle 5 s, 3 dmg/s |
@@ -670,20 +726,73 @@ d f n n f d
 . . . . . .
 ```
 
-**`pore_moth_head_north`** (4w x 4h)
+**`fairy_orb_north (palette fairy_glamour)`** (4w x 4h)
 ```
-p n n p
-n Y n Y
-p n Y n
-p p v p
+w w w w
+w w w w
+w w w w
+w w w w
 ```
 
-**`pore_moth_head_north_emissive`** (4w x 4h)
+**`fairy_orb_north_emissive`** (4w x 4h)
 ```
-. . . .
-. Y . Y
-. . Y .
-. . . .
+C W W C
+W W W W
+W W W W
+C W W C
+```
+
+**`fairy_wing_upper_north (palette fairy_glamour)`** (4w x 10h)
+```
+. w w .
+w v w w
+w v w w
+w w v w
+v w v w
+w w v v
+w w v w
+w v w w
+w v w .
+. w . .
+```
+
+**`fairy_wing_lower_north (palette fairy_glamour)`** (2w x 4h)
+```
+w w
+v w
+w v
+. w
+```
+
+**`heartling_heart_north`** (5w x 6h)
+```
+d f p f d
+f p v f f
+f v n f p
+v f f v f
+f f v f d
+d v f d .
+```
+
+**`heartling_heart_north_emissive`** (5w x 6h)
+```
+. . . . .
+. . . . .
+. . Y . .
+. . . . .
+. . . . .
+. . . . .
+```
+
+**`heartling_membrane_north (left; right = mirror)`** (7w x 7h)
+```
+m m m m m . .
+m v m m m m .
+m m v m m m m
+. m m v m m m
+. m m m v m m
+. . m m m v m
+. . . m . . m
 ```
 
 **`flesh_heart_valve_north`** (8w x 8h)
