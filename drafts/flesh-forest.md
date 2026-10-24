@@ -66,8 +66,8 @@ Two players standing side by side can see different worlds, and neither can chea
 
 Why this shape:
 - No fake block swapping, no per-player chunk packets, no server state that can desync. One flag per client.
-- The hound and puppet disguises reuse vanilla models and textures (wolf, villager), so most of the illusion layer
-  costs no art. The fairy is custom in both forms, drawn from Ben's sketches (7.2).
+- Every mob is custom in both forms, in the style Ben set with the fairy sketches (7.0c): a storybook glamour over an
+  anatomical truth, hinged at shared pivots so the two line up.
 - Every illusory block is a flesh block paired with a vanilla "twin" block whose model it borrows, so the forest
   looks exactly like vanilla flora until it doesn't.
 
@@ -146,8 +146,8 @@ Client side (`client` package, `Dist.CLIENT`):
   effects are the paradise (bright sky, cyan water, birdsong).
 - **Sound:** biome ambient = birds. Pierced clients start a looping heartbeat `SoundInstance` and duck the biome
   ambience.
-- **Mobs:** each disguised entity's renderer holds two models: the vanilla disguise (`WolfModel`, `VillagerModel`,
-  the custom `fairy_glamour` model) and the true code model. `render()` picks by tier. Cave mobs render translucent at
+- **Mobs:** each disguised entity's renderer holds two models: the custom glamour model (`hound_glamour`,
+  `puppet_glamour`, `fairy_glamour`) and the true code model. `render()` picks by tier. Cave mobs render translucent at
   `stalker_alpha` (0.15 deceived, 0.45 uneasy, 1.0 lucid/pierced) plus a faint shimmer particle.
 - **Items:** glamoured items carry an item property `isekai_wilds:glamoured` (1 while the local tier is below
   `pierced`); the item model JSON overrides to the twin's model (diamond, gold ingot, emerald). Pure data.
@@ -249,8 +249,8 @@ Model convention for this sheet: `offset` = the cuboid's minimum corner `[x,y,z]
 raised") plus a value; **the sign of each non-zero `rot` is unchecked until the testkit turntable renders it**
 (per Ben's rule: rotations I couldn't see rendered are flagged).
 
-Disguise models are vanilla and need no grids. True forms carry hero-face grids; other faces are `solid <role>`
-or `pending`.
+Both forms are custom code models (7.0c). Hero faces carry grids; other faces are `solid <role>` or `pending`.
+Concept renders of the whole roster: `drafts/flesh-forest-roster.png` (front and 3/4).
 
 ### 7.0 Shared palette `flesh_truth` (all true forms, blocks and the reward item)
 ```
@@ -273,7 +273,7 @@ r     blood         #7a0f1c   base      drips
 m     membrane      #2a0a12   base      wing membrane
 ```
 
-### 7.0b Palette `fairy_glamour` (the heartling's disguise only)
+### 7.0b Palette `glamour` (every disguise form)
 ```
 token id            hex       layer     note
 .     transparent   -         -
@@ -281,37 +281,77 @@ W     orb_core      #ffffff   emissive  fairy light (always over w)
 C     orb_glow      #bff4ff   emissive  orb rim, halo
 w     wing_pale     #e6fbff   base      leaf wings (rendered translucent)
 v     wing_vein     #a8d8e8   base      leaf veins
+u     fur_white     #f4f1ea   base      storybook wolf fur
+a     fur_shade     #d6cfc0   base      mane, snout, ears, basket
+k     ink           #3a3a44   base      nose, mouth lines
+t     skin_warm     #e8b796   base      villager skin
+e     robe_blue     #6aa0d8   base      villager robe
+l     stem_green    #6fbf5a   base      flower stems
+q     petal_pink    #ffb3e6   base      blooms
+y     petal_gold    #ffe28a   base      blooms
 ```
-Per-entity tint variants multiply the whole model: cyan `#9ff0ff`, pink `#ffb3e6`, gold `#ffe28a`.
+Per-entity tint variants multiply the fairy only: cyan `#9ff0ff`, pink `#ffb3e6`, gold `#ffe28a`.
 
-### 7.1 `flesh_hound` (disguise: wolf)
+### 7.0c Style language (Ben approved via the fairy, 2026-10-24: "use that as the idea for the rest")
+Every mob in the biome follows the heartling's two-form recipe:
+- **Truth = anatomy.** An organ for a body (heart, ribcage and lungs, empty skin, stomach), **sinew spines fanned like
+  wing bones** (wings, hackles, quills, crests), **dark spiked membranes** under the spines, **blood drips**, and
+  **one glowing eye** (`eye_glow`) somewhere it shouldn't be: in a chest, a hood, a sac, the heart itself.
+- **Glamour = storybook.** Too perfect, soft and pale (palette `glamour`): leaf wings, fluffy tufts, flowers, gentle
+  glowing eyes. It should read as the normal mob, just nicer than normal.
+- **Shared pivots.** Every glamour flourish hinges where a true spine hinges: fairy wings and heart spines, wolf tufts
+  and hound hackles, flower stems and puppet quills. A glimpse (5.1) swaps form inside the same outline.
+- The boss is the motif at full size (Ben's drawing); the heartlings are its buds, so the whole roster reads as one organism.
+- Cave mobs (stalker, weeper) have no glamour form. They are concealed instead, and they still carry the spines and the eye.
+
+### 7.1 `flesh_hound` (disguise: storybook wolf)
 ```
 type: entity   content_id: flesh_hound   modid: isekai_wilds   build_target: vanilla_codemodel
 display_name: "Flesh Hound"   glamour_name: "Wolf"   host: none
 spec:
   archetype: quadruped
   axes: { forward: -Z, up: +Y, right: +X }
-  disguise: { model: vanilla WolfModel, texture: minecraft:textures/entity/wolf/wolf.png, tame_look: true }
-  model:
+  disguise:
+    model: hound_glamour (custom: a too-perfect storybook wolf, palette glamour)
     cuboids:
-      - { bone: body,            size:[6,6,12], offset:[-3,6,-6],   pivot:[0,9,0],    rot:[0,0,0],   parent: everything }
-      - { bone: head,            size:[6,6,5],  offset:[-3,8,-11],  pivot:[0,11,-6],  rot:[10,0,0],  parent: body }    # droops, muzzle down
-      - { bone: jaw_left,        size:[2,2,4],  offset:[-4,7,-14],  pivot:[-2,8,-10], rot:[0,-12,0], parent: head }    # split mandible, splays out
-      - { bone: jaw_right,       size:[2,2,4],  offset:[2,7,-14],   pivot:[2,8,-10],  rot:[0,12,0],  parent: head }
-      - { bone: leg_front_left,  size:[2,6,2],  offset:[-3,0,-5],   pivot:[-2,6,-4],  rot:[0,0,0],   parent: everything }
-      - { bone: leg_front_right, size:[2,6,2],  offset:[1,0,-5],    pivot:[2,6,-4],   rot:[0,0,0],   parent: everything }
-      - { bone: leg_back_left,   size:[2,6,2],  offset:[-3,0,3],    pivot:[-2,6,4],   rot:[0,0,0],   parent: everything }
-      - { bone: leg_back_right,  size:[2,6,2],  offset:[1,0,3],     pivot:[2,6,4],    rot:[0,0,0],   parent: everything }
-      - { bone: tail,            size:[2,2,8],  offset:[-1,9,6],    pivot:[0,10,6],   rot:[-30,0,0], parent: body }    # vertebral tail, tip raised
+      - { bone: body, size:[6,6,12], offset:[-3,7,-6], pivot:[0,10,0], rot:[0,0,0], parent: everything }   # solid u
+      - { bone: ruff, size:[7,7,4], offset:[-3.5,7.5,-7], pivot:[0,11,-5], rot:[0,0,0], parent: body }   # solid a; mane
+      - { bone: head, size:[5,5,5], offset:[-2.5,9,-11], pivot:[0,11.5,-6], rot:[0,0,0], parent: body }   # grid:hound_glamour_head_north; soft glowing eyes
+      - { bone: snout, size:[3,2,3], offset:[-1.5,9,-14], pivot:[0,10,-11], rot:[0,0,0], parent: head }   # solid a
+      - { bone: tuft_1, size:[2,4,2], offset:[-1,13,-4.5], pivot:[0,13,-4], rot:[-20,0,0], parent: body }   # solid u; shares hackle_1 pivot
+      - { bone: tuft_2, size:[2,4,2], offset:[-1,13,-1.5], pivot:[0,13,-1], rot:[-20,0,0], parent: body }   # solid u; shares hackle_2 pivot
+      - { bone: tail, size:[3,3,9], offset:[-1.5,10.5,6], pivot:[0,12,7], rot:[-35,0,0], parent: body }   # solid u; fluffy; shares tail pivot
+      - { bone: ear_left, size:[1.5,3,1], offset:[-2.5,14,-9], pivot:[-1.75,14,-8.5], rot:[0,0,15], parent: head }   # solid a; leaf-shaped
+      - { bone: leg_front_left, size:[2,7,2], offset:[-3,0,-5], pivot:[-2,7,-4], rot:[0,0,0], parent: everything }   # solid u
+      - { bone: leg_back_left, size:[2,7,2], offset:[-3,0,3], pivot:[-2,7,4], rot:[0,0,0], parent: everything }   # solid u
+      - { mirror: "every *_left bone above has a *_right twin: offset x -> -x-w, pivot x -> -x, rot y,z -> -y,-z; grids mirrored left-right" }
+    texture: { head.north: grid:hound_glamour_head_north, body/legs/tail/tufts: solid u, ruff/snout/ears: solid a }
+  model:            # the TRUE form: ribcage hound
+    cuboids:
+      - { bone: spine, size:[2,2,14], offset:[-1,11,-7], pivot:[0,12,0], rot:[0,0,0], parent: everything }   # solid s; backbone
+      - { bone: lungs, size:[5,4,7], offset:[-2.5,7,-4], pivot:[0,9,0], rot:[0,0,0], parent: spine }   # solid p; pulse M on the beat
+      - { bone: head, size:[5,5,5], offset:[-2.5,9,-12], pivot:[0,11.5,-7], rot:[10,0,0], parent: spine }   # grid:hound_true_head_north; single eye, split maw
+      - { bone: hackle_1, size:[1,7,1.5], offset:[-0.5,13,-4.5], pivot:[0,13,-4], rot:[-20,0,0], parent: spine }   # solid s; dorsal spines = heartling wing bones
+      - { bone: hackle_2, size:[1,6,1.5], offset:[-0.5,13,-1.5], pivot:[0,13,-1], rot:[-20,0,0], parent: spine }   # solid s
+      - { bone: hackle_3, size:[1,5,1.5], offset:[-0.5,13,1.5], pivot:[0,13,2], rot:[-20,0,0], parent: spine }   # solid s
+      - { bone: tail, size:[1,9,1], offset:[-0.5,11.5,7], pivot:[0,12,7], rot:[-35,0,0], parent: spine }   # solid s; vertebral, tip raised
+      - { bone: rib_left_1, size:[1,6,1], offset:[-2.5,6,-5], pivot:[-1,11.5,-4.5], rot:[0,0,-25], parent: spine }   # solid b; ribs curve out and down
+      - { bone: rib_left_2, size:[1,6,1], offset:[-2.5,6,-2], pivot:[-1,11.5,-1.5], rot:[0,0,-25], parent: spine }   # solid b
+      - { bone: rib_left_3, size:[1,6,1], offset:[-2.5,6,1], pivot:[-1,11.5,1.5], rot:[0,0,-25], parent: spine }   # solid b
+      - { bone: rib_left_4, size:[1,6,1], offset:[-2.5,6,4], pivot:[-1,11.5,4.5], rot:[0,0,-25], parent: spine }   # solid b
+      - { bone: jaw_left, size:[2,2,4], offset:[-3,8,-15], pivot:[-2,9,-11], rot:[0,-12,0], parent: head }   # solid b; mandible splays out
+      - { bone: leg_front_left, size:[1.5,7,1.5], offset:[-2.75,0,-5.5], pivot:[-2,7,-4.75], rot:[0,0,0], parent: everything }   # solid d
+      - { bone: leg_back_left, size:[1.5,7,1.5], offset:[-2.75,0,3.5], pivot:[-2,7,4.25], rot:[0,0,0], parent: everything }   # solid d
+      - { mirror: "every *_left bone above has a *_right twin: offset x -> -x-w, pivot x -> -x, rot y,z -> -y,-z; grids mirrored left-right" }
     self_checks:
-      - "feet at y=0 (legs 0..6), body underside at y=6"
-      - "head rear z=-6 seats on body front z=-6; jaws overlap head by 1px (declared joint)"
-      - "most-negative Z = jaws at -14 (forward)"
+      - "feet at y=0 (legs 0..7); ribs hang to y=6, clear of the legs' tops"
+      - "head rear z=-7 seats on spine front z=-7; jaws overlap head by 1px (declared joint)"
+      - "most-negative Z = jaws at -15 (forward)"
+      - "glamour tufts and tail share the hackle and tail pivots (glimpse keeps the silhouette)"
   texture:
-    head.north: { base: grid:flesh_hound_head_north, emissive: grid:flesh_hound_head_north_emissive }
-    head.up/east/west/south: solid f     body.*: pending (rib bands s over f)    jaw_*: solid b
-    legs: solid d   tail: pending (s vertebrae over d)
-  rig: { bones: quadruped(everything, body, head, jaw_left, jaw_right, leg_*, tail), locators: [ {id: locator_muzzle, on_bone: head, pos:[0,8,-14]} ] }
+    head.north: { base: grid:hound_true_head_north, emissive: grid:hound_true_head_north_emissive }
+    lungs: { base: solid p, emissive: pending (M pulse cells) }   spine/hackles/tail: solid s   ribs/jaws: solid b   legs: solid d
+  rig: { bones: quadruped(everything, spine, lungs, head, jaw_*, rib_*, hackle_*, leg_*, tail), locators: [ {id: locator_muzzle, on_bone: head, pos:[0,9,-15]} ] }
   motion:
     rest_pose: [ {bone: head, rot:[10,0,0]}, {bone: tail, rot:[-30,0,0]} ]
     anims: [ {name: idle, type: loop}, {name: walk, type: loop}, {name: lunge, type: once},
@@ -334,7 +374,7 @@ spec:
     tensura: { can_be_named: false, entity_existence_ep: 2500 }
   npc: none
 verify:
-  - deceived client sees a vanilla wolf; pierced client sees the flesh hound; both at the same position
+  - deceived client sees the storybook wolf; pierced client sees the ribcage hound; both at the same position, tufts on hackles
   - feeding it a bone shows hearts, then it walks 4-6 blocks ahead toward the nearest pore and waits when you stop
   - against a pierced player it lunges from 3-8 blocks; it bites only at point-blank
   - death message names a "Flesh Hound"; killing it grants Tensura EP
@@ -428,16 +468,45 @@ verify:
   - against a pierced player it spits blood darts from range and never melees
 ```
 
-### 7.3 `skin_puppet` (disguise: villager)
+### 7.3 `skin_puppet` (disguise: flower-basket villager)
 ```
 type: entity   content_id: skin_puppet   modid: isekai_wilds   build_target: vanilla_codemodel
 display_name: "Skin Puppet"   glamour_name: "Villager"   host: none
 spec:
   archetype: humanoid_npc
   axes: { forward: -Z, up: +Y, right: +X }
-  disguise: { model: vanilla VillagerModel, texture: minecraft:textures/entity/villager/type/plains.png }
-  model: pending (biped: villager proportions, sagging skin over a hollow frame; face north is a stitched mouth)
-  texture: pending
+  disguise:
+    model: puppet_glamour (custom: a smiling villager carrying a basket of flowers, palette glamour)
+    cuboids:
+      - { bone: body, size:[8,12,6], offset:[-4,10,-3], pivot:[0,16,0], rot:[0,0,0], parent: everything }   # solid e; robe
+      - { bone: head, size:[8,10,8], offset:[-4,22,-4], pivot:[0,22,0], rot:[0,0,0], parent: body }   # grid:puppet_glamour_head_north; warm smile, glowing eyes
+      - { bone: nose, size:[2,4,2], offset:[-1,23,-6], pivot:[0,25,-4], rot:[0,0,0], parent: head }   # solid t
+      - { bone: arms, size:[8,4,4], offset:[-4,15,-6], pivot:[0,17,-4], rot:[0,0,0], parent: body }   # solid e; crossed
+      - { bone: basket, size:[6,5,3], offset:[-3,15,3], pivot:[0,17.5,4.5], rot:[0,0,0], parent: body }   # solid a; flower basket on the back
+      - { bone: stem_mid, size:[1,8,1], offset:[-0.5,18,2.5], pivot:[0,18,3], rot:[-30,0,0], parent: basket }   # solid l; shares quill_mid pivot
+      - { bone: bloom_mid, size:[3,3,1], offset:[-1.5,25.3,7], pivot:[0,26.8,7.5], rot:[-30,0,0], parent: stem_mid }   # solid q; petal
+      - { bone: stem_left, size:[1,8,1], offset:[-0.5,18,2.5], pivot:[0,18,3], rot:[-30,0,28], parent: basket }   # solid l; shares quill_left pivot
+      - { bone: leg_left, size:[4,10,4], offset:[-4,0,-2], pivot:[-2,10,0], rot:[0,0,0], parent: everything }   # solid e
+      - { mirror: "every *_left bone above has a *_right twin: offset x -> -x-w, pivot x -> -x, rot y,z -> -y,-z; grids mirrored left-right" }
+    texture: { head.north: grid:puppet_glamour_head_north, body/arms/legs: solid e, nose: solid t, basket: solid a, stems: solid l, bloom: solid q }
+  model:            # the TRUE form: hollow skin on a sinew frame
+    cuboids:
+      - { bone: spine, size:[2,12,2], offset:[-1,10,-0.5], pivot:[0,16,0.5], rot:[0,0,0], parent: everything }   # solid s; exposed column
+      - { bone: skin, size:[8,10,5], offset:[-4,11,-2.5], pivot:[0,16,0], rot:[0,0,0], parent: spine }   # grid:puppet_true_skin_north; torn open: ribs show
+      - { bone: head, size:[7,8,7], offset:[-3.5,21,-4.5], pivot:[0,21,-1], rot:[8,0,0], parent: spine }   # grid:puppet_true_head_north; sagging hood, one eye, stitched grin
+      - { bone: quill_mid, size:[1,8,1], offset:[-0.5,18,2.5], pivot:[0,18,3], rot:[-30,0,0], parent: skin }   # solid s; back spines
+      - { bone: quill_left, size:[1,8,1], offset:[-0.5,18,2.5], pivot:[0,18,3], rot:[-30,0,28], parent: skin }   # solid s
+      - { bone: leg_left, size:[2,11,2], offset:[-3,0,-1], pivot:[-2,11,0], rot:[0,0,0], parent: everything }   # solid s; sinew
+      - { bone: arm_left, size:[3,11,3], offset:[-7,10,-1.5], pivot:[-5.5,21,0], rot:[0,0,-6], parent: skin }   # solid p; dangling skin sleeve
+      - { mirror: "every *_left bone above has a *_right twin: offset x -> -x-w, pivot x -> -x, rot y,z -> -y,-z; grids mirrored left-right" }
+    self_checks:
+      - "feet at y=0 (legs 0..11)"
+      - "head droops forward: most-negative Z is the head face at about -4.5"
+      - "glamour flower stems share the quill pivots (glimpse: flowers become spines)"
+  texture:
+    head.north: { base: grid:puppet_true_head_north, emissive: grid:puppet_true_head_north_emissive }
+    skin.north: { base: grid:puppet_true_skin_north }   spine/legs/quills: solid s   arms: solid p (pending: v seams)
+  rig: { bones: humanoid_npc(everything, spine, skin, head, arm_*, leg_*, quill_*), locators: [ {id: locator_hand_left, on_bone: arm_left, pos:[-5.5,10,0]} ] }
   behaviour:
     attributes: { max_health: 30, movement_speed: 0.3, attack_damage: 6, follow_range: 24 }
     ai_goals:
@@ -472,22 +541,24 @@ spec:
   concealment: "attribute tensura:presence_concealment > 0 while any viewer is glamoured, so Magic Sense / detection
                 skills never glow it (verified: > 0 means never glows for any sense); set to 0 once the illusion breaks
                 for the target player or inside the heart chamber" 
-  model:
+  model:            # no glamour form: it is concealed instead (visibility above)
     cuboids:
-      - { bone: leg_left,  size:[4,18,4],  offset:[-4.5,0,-2], pivot:[-2.5,18,0], rot:[0,0,0],   parent: everything }
-      - { bone: leg_right, size:[4,18,4],  offset:[0.5,0,-2],  pivot:[2.5,18,0],  rot:[0,0,0],   parent: everything }
-      - { bone: body,      size:[10,14,6], offset:[-5,18,-3],  pivot:[0,18,0],    rot:[25,0,0],  parent: everything }  # hunched forward
-      - { bone: head,      size:[6,6,7],   offset:[-3,30,-7],  pivot:[0,31,-2],   rot:[-25,0,0], parent: body }        # counter-tilt, face level
-      - { bone: arm_left,  size:[4,22,4],  offset:[-9,10,-2],  pivot:[-7,30,0],   rot:[-10,0,5], parent: body }        # long arms reaching forward
-      - { bone: arm_right, size:[4,22,4],  offset:[5,10,-2],   pivot:[7,30,0],    rot:[-10,0,-5], parent: body }
-    self_checks: [ "feet at y=0", "legs top y=18 meets body underside", "with hunch applied, head is the most-negative Z" ]
+      - { bone: body, size:[10,14,6], offset:[-5,18,-3], pivot:[0,18,0], rot:[15,0,0], parent: everything }   # grid:stalker_body_north; chest eye
+      - { bone: head, size:[6,6,7], offset:[-3,30,-7], pivot:[0,31,-2], rot:[-15,0,0], parent: body }   # grid:stalker_head_north; eyeless maw
+      - { bone: leg_left, size:[4,18,4], offset:[-4.5,0,-2], pivot:[-2.5,18,0], rot:[0,0,0], parent: everything }   # solid d
+      - { bone: arm_left, size:[4,22,4], offset:[-9,10,-2], pivot:[-7,30,0], rot:[-10,0,5], parent: body }   # solid p; long, reaching
+      - { bone: spine_left_1, size:[1,14,1], offset:[-5,31,1], pivot:[-4.5,31,1.5], rot:[0,0,15], parent: body }   # solid s; shoulder wing bones
+      - { bone: spine_left_2, size:[1,12,1], offset:[-5,31,1], pivot:[-4.5,31,1.5], rot:[0,0,35], parent: body }   # solid s
+      - { bone: spine_left_3, size:[1,10,1], offset:[-5,31,1], pivot:[-4.5,31,1.5], rot:[0,0,55], parent: body }   # solid s
+      - { bone: membrane_left, size:[8,8,0], offset:[-12,24,2.5], pivot:[-4.5,31,2.5], rot:[0,0,25], parent: body }   # grid:stalker_membrane_north; spiked, hangs under the spines
+      - { mirror: "every *_left bone above has a *_right twin: offset x -> -x-w, pivot x -> -x, rot y,z -> -y,-z; grids mirrored left-right" }
+    self_checks: [ "feet at y=0", "legs top y=18 meets body underside", "with the hunch applied, head is the most-negative Z", "shoulder spines + membrane echo the heartling wings" ]
   texture:
-    head.north: { base: [d f f f f d / f v n n v f / f n M M n f / f n n n n f / f b n n b f / d b b b b d],
-                  emissive: [. . . . . . / . . . . . . / . . M M . . / . . . . . . / . . . . . . / . . . . . .] }
-    other faces: pending (flayed muscle f/p bands, exposed spine s on body.south)
-  rig: { bones: biped(everything, body, head, arm_left, arm_right, leg_left, leg_right), locators: [ {id: locator_hand_left, on_bone: arm_left, pos:[-7,10,0]}, {id: locator_hand_right, on_bone: arm_right, pos:[7,10,0]} ] }
+    body.north: { base: grid:stalker_body_north, emissive: grid:stalker_body_north_emissive }   # the chest eye
+    head.north: { base: grid:stalker_head_north }   membrane_*.north: grid:stalker_membrane_north   spines: solid s   arms: solid p   legs: solid d
+  rig: { bones: biped(everything, body, head, arm_*, leg_*, spine_*, membrane_*), locators: [ {id: locator_hand_left, on_bone: arm_left, pos:[-7,10,0]}, {id: locator_hand_right, on_bone: arm_right, pos:[7,10,0]} ] }
   motion:
-    rest_pose: [ {bone: body, rot:[25,0,0]}, {bone: head, rot:[-25,0,0]}, {bone: arm_left, rot:[-10,0,5]}, {bone: arm_right, rot:[-10,0,-5]} ]
+    rest_pose: [ {bone: body, rot:[15,0,0]}, {bone: head, rot:[-15,0,0]}, {bone: arm_left, rot:[-10,0,5]}, {bone: arm_right, rot:[-10,0,-5]}, {bone: spine_left_1, rot:[0,0,15]}, {bone: membrane_left, rot:[0,0,25]} ]
     anims: [ {name: idle, type: loop}, {name: walk, type: loop}, {name: lash, type: once}, {name: claw, type: once} ]
   behaviour:
     attributes: { max_health: 120, movement_speed: 0.28, attack_damage: 14, follow_range: 40, armor: 10, knockback_resistance: 0.6 }
@@ -517,17 +588,18 @@ spec:
   archetype: blob
   axes: { forward: -Z, up: +Y, right: +X }
   visibility: same as pore_stalker
-  model:
+  model:            # no glamour form (concealed): a stomach sac on drip legs
     cuboids:
-      - { bone: core,      size:[12,9,12], offset:[-6,0,-6],  pivot:[0,4.5,0],  rot:[0,0,0],  parent: everything }
-      - { bone: maw,       size:[6,3,1],   offset:[-3,3,-7],  pivot:[0,4.5,-6], rot:[0,0,0],  parent: core }
-      - { bone: sac_left,  size:[3,3,3],   offset:[-7,7,-1],  pivot:[-5.5,8.5,0.5], rot:[0,0,20], parent: core }
-      - { bone: sac_right, size:[3,3,3],   offset:[4,7,1],    pivot:[5.5,8.5,2.5],  rot:[0,0,-20], parent: core }
-      - { bone: sac_top,   size:[4,4,4],   offset:[-2,8,1],   pivot:[0,10,3],   rot:[0,45,0], parent: core }
-    self_checks: [ "base at y=0", "maw is the most-negative Z (-7)" ]
-  texture: { maw.north: solid n, sac_*: { base: solid f, emissive: solid B }, core: pending }
-  rig: { bones: blob(everything, core, maw, sac_*), locators: [ {id: locator_center, on_bone: maw, pos:[0,4.5,-7]} ] }
-  motion: { rest_pose: [ {bone: sac_top, rot:[0,45,0]} ], anims: [ {name: pulse, type: loop}, {name: lob, type: once} ] }
+      - { bone: core, size:[12,9,12], offset:[-6,1,-6], pivot:[0,5.5,0], rot:[0,0,0], parent: everything }   # grid:weeper_core_north; bile eye
+      - { bone: crest_mid, size:[1,7,1], offset:[-0.5,10,0], pivot:[0,10,0.5], rot:[-15,0,0], parent: core }   # solid s; crest spines
+      - { bone: crest_left, size:[1,7,1], offset:[-0.5,10,0], pivot:[0,10,0.5], rot:[-15,0,30], parent: core }   # solid s
+      - { bone: drip_leg_front_left, size:[2,3,2], offset:[-5,0,-5], pivot:[-4,3,-4], rot:[0,0,0], parent: core }   # solid r; drip legs
+      - { bone: drip_leg_back_left, size:[2,2,2], offset:[-5,0,3], pivot:[-4,2,4], rot:[0,0,0], parent: core }   # solid r
+      - { mirror: "every *_left bone above has a *_right twin: offset x -> -x-w, pivot x -> -x, rot y,z -> -y,-z; grids mirrored left-right" }
+    self_checks: [ "drip legs reach y=0", "core front (eye) is the most-negative Z (-6)" ]
+  texture: { core.north: { base: grid:weeper_core_north, emissive: grid:weeper_core_north_emissive }, crest: solid s, drip legs: solid r, other core faces: pending }
+  rig: { bones: blob(everything, core, crest_*, drip_leg_*), locators: [ {id: locator_center, on_bone: core, pos:[0,5.5,-6]} ] }
+  motion: { rest_pose: [ {bone: crest_mid, rot:[-15,0,0]} ], anims: [ {name: pulse, type: loop}, {name: lob, type: once} ] }
   behaviour:
     attributes: { max_health: 80, movement_speed: 0.12, follow_range: 32, armor: 6 }
     ai_goals:
@@ -548,32 +620,39 @@ display_name: "The Grove's Heart"   host: none
 spec:
   archetype: blob
   axes: { forward: -Z, up: +Y, right: +X }
-  render_scale: 3.0      # model px are drawn x3: ~2.6 blocks tall
+  render_scale: 2.0      # model px drawn x2: ~4 blocks tall with the spines, wingspan ~9 blocks
+  look: "Ben's winged-heart drawing at full scale: the heartlings' mother. Same parts as the heartling, plus the
+         giant eye where the valve was."
   model:
     cuboids:
-      - { bone: apex,         size:[10,6,10],  offset:[-5,0,-5],   pivot:[0,4,0],    rot:[0,45,0],  parent: everything }   # faceted point
-      - { bone: core,         size:[20,24,18], offset:[-10,4,-9],  pivot:[0,16,0],   rot:[0,0,0],   parent: everything }
-      - { bone: valve_front,  size:[8,8,1],    offset:[-4,12,-10], pivot:[0,16,-9.5], rot:[0,0,0],  parent: core }
-      - { bone: atrium_left,  size:[10,10,10], offset:[-12,24,-4], pivot:[-7,26,1],  rot:[0,0,15],  parent: core }        # tilts outward
-      - { bone: atrium_right, size:[10,10,10], offset:[2,24,-4],   pivot:[7,26,1],   rot:[0,0,-15], parent: core }
-      - { bone: aorta,        size:[6,14,6],   offset:[-3,26,-1],  pivot:[0,28,2],   rot:[-20,0,0], parent: core }        # arches back
-    self_checks: [ "apex bottom at y=0", "valve_front is the most-negative Z (-10)", "atria seat on core top y=28 with 4px declared overlap" ]
+      - { bone: core, size:[20,24,18], offset:[-10,4,-9], pivot:[0,16,0], rot:[0,0,-10], parent: everything }   # grid:boss_core_north; the eye
+      - { bone: apex, size:[10,6,10], offset:[-5,0,-5], pivot:[0,4,0], rot:[0,45,-10], parent: core }   # solid d
+      - { bone: aorta, size:[6,14,6], offset:[-3,26,-1], pivot:[0,28,2], rot:[-20,0,0], parent: core }   # solid f; arches back
+      - { bone: atrium_left, size:[9,9,10], offset:[-12,25,-4], pivot:[-7,27,1], rot:[0,0,15], parent: core }   # solid p
+      - { bone: vessel_left, size:[2,8,2], offset:[-8,30,0], pivot:[-7,30,1], rot:[0,0,20], parent: atrium_left }   # solid V
+      - { bone: drip_left, size:[2,10,2], offset:[-5,-6,-6], pivot:[-4,4,-5], rot:[0,0,0], parent: core }   # solid r; long blood drip
+      - { bone: spine_left_1, size:[2,40,2], offset:[-12,20,2], pivot:[-11,21,3], rot:[0,0,16], parent: core }   # solid s; wing bones, 4 per side
+      - { bone: spine_left_2, size:[2,36,2], offset:[-12,20,2], pivot:[-11,21,3], rot:[0,0,32], parent: core }   # solid s
+      - { bone: spine_left_3, size:[2,30,2], offset:[-12,20,2], pivot:[-11,21,3], rot:[0,0,48], parent: core }   # solid s
+      - { bone: spine_left_4, size:[2,24,2], offset:[-12,20,2], pivot:[-11,21,3], rot:[0,0,64], parent: core }   # solid s
+      - { bone: membrane_left, size:[28,28,0], offset:[-38,4,6], pivot:[-11,21,6], rot:[0,0,30], parent: core }   # grid:boss_membrane_north; spiked wing membrane
+      - { mirror: "every *_left bone above has a *_right twin: offset x -> -x-w, pivot x -> -x, rot y,z -> -y,-z; grids mirrored left-right" }
+    self_checks: [ "apex bottom at y=0 (drips hang below into the floor pool, declared)", "core front (the eye) is the most-negative Z (-9)", "atria seat on core top with declared overlap" ]
   texture:
-    core.north:        { base: grid:flesh_heart_core_north,  emissive: grid:flesh_heart_core_north_emissive }
-    valve_front.north: { base: grid:flesh_heart_valve_north, emissive: grid:flesh_heart_valve_north_emissive }
-    atria: solid p   aorta: solid v   apex: solid d   other core faces: pending (mirror north veins)
-  rig: { bones: blob(everything, core, apex, valve_front, atrium_left, atrium_right, aorta), locators: [ {id: locator_center, on_bone: valve_front, pos:[0,16,-10]} ] }
+    core.north: { base: grid:boss_core_north, emissive: grid:boss_core_north_emissive }   # the eye + pulsing veins
+    membrane_*.north: grid:boss_membrane_north   spines: solid s   atria: solid p   aorta: solid f   apex: solid d   vessels: solid v   drips: solid r
+  rig: { bones: blob(everything, core, apex, aorta, atrium_*, vessel_*, drip_*, spine_*, membrane_*), locators: [ {id: locator_center, on_bone: core, pos:[0,16,-9]} ] }
   motion:
-    rest_pose: [ {bone: apex, rot:[0,45,0]}, {bone: atrium_left, rot:[0,0,15]}, {bone: atrium_right, rot:[0,0,-15]}, {bone: aorta, rot:[-20,0,0]} ]
-    anims: [ {name: beat, type: loop, note: "core scale 1.0 -> 1.08 -> 1.0 at bpm (phase 1: 60, phase 2: 90, phase 3: 140)"},
-             {name: valve_open, type: once}, {name: death_burst, type: once, particle_keys:[blood@locator_center]} ]
+    rest_pose: [ {bone: core, rot:[0,0,-10]}, {bone: apex, rot:[0,45,-10]}, {bone: aorta, rot:[-20,0,0]}, {bone: spine_left_1, rot:[0,0,16]}, {bone: membrane_left, rot:[0,0,30]} ]
+    anims: [ {name: beat, type: loop, note: "core scale 1.0 -> 1.08 -> 1.0 at bpm (phase 1: 60, phase 2: 90, phase 3: 140); drips stretch on the beat"},
+             {name: wing_spread, type: once, note: "phase 3: spines + membranes open 20 degrees wider"}, {name: eye_open, type: once}, {name: death_burst, type: once, particle_keys:[blood@locator_center]} ]
   behaviour:
     attributes: { max_health: 1200, armor: 12, knockback_resistance: 1.0, movement_speed: 0 }
     boss_bar: true
     phases:
       - "1 PULSE (100-70%): every 4th beat a heartbeat_shockwave ring (jump it); veins spawn blood_clot x2 every 10 s"
       - "2 ARTERIES (70-40%): heart turns invulnerable and heals 1%/s while any of the 4 heart_artery nodes lives; cut all 4"
-      - "3 EXPOSED (40-0%): valve opens; blood_lance volleys at range; heart_pressure pulses (capped at tier 2)"
+      - "3 EXPOSED (40-0%): the eye opens and the wings spread; blood_lance volleys at range; heart_pressure pulses (capped at tier 2)"
     ai_goals:
       - {priority: 1, goal: blood_lance,          params:{ phase: 3, range: 4-30, cd: 30-50 }}
       - {priority: 2, goal: heartbeat_shockwave,  params:{ every_n_beats: 4, radius: 12 }}
@@ -591,8 +670,8 @@ verify:
   - phase 3 lances fire at range; pressure staggers but never pins (tier cap 2)
   - killing it drops one heart_core; the Boss Checklist / boss bar shows "The Grove's Heart"
 ```
-`heart_artery` (blob, `core` 6x6x6 at offset [-3,0,-3], solid v with emissive M; 150 HP, stationary, wall-anchored,
-EP 5000). `blood_clot` (blob, `core` 6x5x6 at [-3,0,-3], solid f; 12 HP, melee only, speed 0.3, EP 300).
+`heart_artery` (blob: a knot of vessels with one small eye, `core` 6x6x6 at offset [-3,0,-3], solid v with emissive M; 150 HP, stationary, wall-anchored,
+EP 5000). `blood_clot` (blob: a wingless heartling, a drip with an eye, `core` 6x5x6 at [-3,0,-3], solid f; 12 HP, melee only, speed 0.3, EP 300).
 
 ### 7.7 Abilities (spell lane, `host: none`, `build_target: event_handler`)
 | content_id | cast_type | numbers (defaults) |
@@ -706,26 +785,6 @@ Orientation per `core/texture-grid.md` section 3: row 0 = top, col 0 = left, see
 grids are sparse and every emissive cell sits over a base cell. Block textures are 16x16 flat sprites; their
 illusion twins use vanilla textures and need no grids.
 
-**`flesh_hound_head_north`** (6w x 6h)
-```
-d f f f f d
-f p v v p f
-f p n n p f
-f b n n b f
-f b n n b f
-d f n n f d
-```
-
-**`flesh_hound_head_north_emissive`** (6w x 6h)
-```
-. . . . . .
-. . . . . .
-. . M M . .
-. . . . . .
-. . . . . .
-. . . . . .
-```
-
 **`fairy_orb_north (palette fairy_glamour)`** (4w x 4h)
 ```
 w w w w
@@ -793,86 +852,6 @@ m m v m m m m
 . m m m v m m
 . . m m m v m
 . . . m . . m
-```
-
-**`flesh_heart_valve_north`** (8w x 8h)
-```
-d v v v v v v d
-v s p p p p s v
-v p n n n n p v
-v p n Y Y n p v
-v p n Y Y n p v
-v p n n n n p v
-v s p p p p s v
-d v v v v v v d
-```
-
-**`flesh_heart_valve_north_emissive`** (8w x 8h)
-```
-. . . . . . . .
-. . . . . . . .
-. . . . . . . .
-. . . Y Y . . .
-. . . Y Y . . .
-. . . . . . . .
-. . . . . . . .
-. . . . . . . .
-```
-
-**`flesh_heart_core_north`** (20w x 24h)
-```
-d d d d d d d d d d d d d d d d d d d d
-d f f f f f f v f v f f f f v f f f v d
-d v f f f f f f v v f f f f p v f f v d
-d v f f f f f f v f f f f f f v f v f d
-d f v f f p f f v v f f f f f f v v f d
-d f v f f f f f v v f f p f f f v v f d
-d f f v f f f v f f v f f f f f v v f d
-d f f v f f f v f f v f f f f f v v f d
-d f f f v f f v f f p v f f f f v f v d
-d f f f v f v f f f f v f f f v f p v d
-d p f f f v v f f f f f v f f v f f f d
-d f f f f v v f p f f f v f f v f f f d
-d f f f f v v f f f f f f v v p f f f d
-d f f f f v v f f f f f f v v f f f f d
-d f f f f v p v f f f f f f v f f f f d
-d f f f v f f v f f f f f v v f f f f d
-d v f f v f f f v f f f f v f v f f f d
-d v f f v f f f v f f f f v f v f f f d
-d f v v f f f f f v f p v f f f v f f d
-d f v v f f f f f v f f v f f f v f p d
-d f p v f f f f f f v f v f f f f v f d
-d f v v f f f f f p v v f f f f f v f d
-d f v f v f f f f f f v f f f f p f v d
-d d d d d d d d d d d d d d d d d d d d
-```
-
-**`flesh_heart_core_north_emissive`** (20w x 24h)
-```
-. . . . . . . . . . . . . . . . . . . .
-. . . . . . . M . . . . . . . . . . . .
-. . . . . . . . . . . . . . . . . . M .
-. M . . . . . . . . . . . . . . . M . .
-. . . . . . . . M . . . . . . . M . . .
-. . . . . . . . . . . . . . . . . . . .
-. . . . . . . . . . M . . . . . . . . .
-. . . . . . . . . . . . . . . . . M . .
-. . . . M . . . . . . . . . . . M . . .
-. . . . . . . . . . . M . . . M . . . .
-. . . . . . M . . . . . . . . . . . . .
-. . . . . M . . . . . . . . . . . . . .
-. . . . . . . . . . . . . . . . . . . .
-. . . . . . . . . . . . . . . . . . . .
-. . . . . . . . . . . . . . M . . . . .
-. . . . . . . . . . . . . M . . . . . .
-. . . . M . . . M . . . . . . . . . . .
-. . . . . . . . . . . . . . . M . . . .
-. . M . . . . . . . . . . . . . . . . .
-. . . . . . . . . M . . . . . . . . . .
-. . . . . . . . . . . . M . . . . . . .
-. . . M . . . . . . . M . . . . . . . .
-. . M . . . . . . . . . . . . . . . M .
-. . . . . . . . . . . . . . . . . . . .
 ```
 
 **`heart_core_item`** (16w x 16h)
@@ -994,3 +973,255 @@ p f f s f v f p f s f f f f f s
 . . . . . . . . . . . . . . . .
 . . . . . . . . . . . . . . . .
 ```
+
+**`hound_glamour_head_north`** (5w x 5h, palette glamour)
+```
+u u u u u
+u C u C u
+u u u u u
+a u u u a
+a a u a a
+```
+
+**`hound_true_head_north`** (5w x 5h, palette flesh_truth)
+```
+d f f f d
+f f n f f
+v f f f v
+b n n n b
+d b n b d
+```
+
+**`hound_true_head_north_emissive`** (5w x 5h, palette flesh_truth)
+```
+. . . . .
+. . Y . .
+. . . . .
+. . . . .
+. . . . .
+```
+
+**`puppet_glamour_head_north`** (8w x 10h, palette glamour)
+```
+t t t t t t t t
+t t t t t t t t
+t a t t t t a t
+t C k t t k C t
+t t t t t t t t
+t t t t t t t t
+t k t t t t k t
+t t k k k k t t
+t t t t t t t t
+a t t t t t t a
+```
+
+**`puppet_true_head_north`** (7w x 8h, palette flesh_truth)
+```
+p p p p p p p
+p d p p p d p
+p p v n v p p
+p v n Y n v p
+p p v n v p p
+d p p p p p d
+p b v b v b p
+d p d p d p d
+```
+
+**`puppet_true_head_north_emissive`** (7w x 8h, palette flesh_truth)
+```
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+```
+
+**`puppet_true_skin_north`** (8w x 10h, palette flesh_truth)
+```
+p p p p p p p p
+p p v p p v p p
+p v n n n n v p
+p b n b b n b p
+p v n n n n v p
+p b n b b n b p
+p v n n n n v p
+p p v n n v p p
+d p p v v p p d
+d d p p p p d d
+```
+
+**`stalker_body_north`** (10w x 14h, palette flesh_truth)
+```
+f p f f f f f f p f
+f f v f f f f v f f
+p f f v v v v f f p
+f f v d d d d v f f
+f v d n n n n d v f
+f v d n Y Y n d v f
+f v d n Y Y n d v f
+f v d n n n n d v f
+f f v d d d d v f f
+p f f v v v v f f p
+f f p f f f f p f f
+f v f f p p f f v f
+f f f v f f v f f f
+d f f f f f f f f d
+```
+
+**`stalker_body_north_emissive`** (10w x 14h, palette flesh_truth)
+```
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . Y Y . . . .
+. . . . Y Y . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+```
+
+**`stalker_head_north`** (6w x 6h, palette flesh_truth)
+```
+d f f f f d
+f v n n v f
+f n M M n f
+f n n n n f
+f b n n b f
+d b b b b d
+```
+
+**`stalker_membrane_north (left; right = mirror)`** (8w x 8h, palette flesh_truth)
+```
+m m m m m m . .
+m v m m m m m .
+m m v m m m m m
+. m m v m m m m
+. m m m v m m m
+. . m m m v m m
+. . . m m . v m
+. . . . m . . m
+```
+
+**`weeper_core_north`** (12w x 9h, palette flesh_truth)
+```
+d f f f f f f f f f f d
+f f p f f v v f f p f f
+f v f f f f f f f f v f
+f f f d n n n n d f f f
+f f d n B B B B n d f f
+f v d n B Y Y B n d v f
+f f d n B B B B n d f f
+f f f d n n n n d f f f
+d f v f f f f f f v f d
+```
+
+**`weeper_core_north_emissive`** (12w x 9h, palette flesh_truth)
+```
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . B B B B . . . .
+. . . . B Y Y B . . . .
+. . . . B B B B . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+```
+
+**`boss_core_north`** (20w x 24h, palette flesh_truth)
+```
+d d d d d d d d d d d d d d d d d d d d
+d f f f f f f v f v f f f f v f f f v d
+d v f f f f f f v v f f f f p v f f v d
+d v f f f f f f v f f f f f f v f v f d
+d f v f f p f f v v f f f f f f v v f d
+d f v f f f f d d d d d d f f f v v f d
+d f f v f f d n n n n n n d f f v v f d
+d f f v f f d n s s s s n d f f v v f d
+d f f f v d n s s n n s s n d f v f v d
+d f f f v d n s n n n n s n d v f p v d
+d p f f f d n s s n n s s n d v f f f d
+d f f f f v d n s s s s n d f v f f f d
+d f f f f v d n n n n n n d v p f f f d
+d f f f f v v d d d d d d v v f f f f d
+d f f f f v p v f f f f f f v f f f f d
+d f f f v f f v f f f f f v v f f f f d
+d v f f v f f f v f f f f v f v f f f d
+d v f f v f f f v f f f f v f v f f f d
+. d v v f f f f f v f p v f f f v f d .
+. . d v f f f f f v f f v f f f v d . .
+. . . d f f f f f f v f v f f f d . . .
+. . . . d f f f f p v v f f f d . . . .
+. . . . . d f f f f f v f f d . . . . .
+. . . . . . d f f f f v f d . . . . . .
+```
+
+**`boss_core_north_emissive`** (20w x 24h, palette flesh_truth)
+```
+. . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . M . . . . M . . . . .
+. . . . . . . . M . . . . . . . . . M .
+. . . . . . . . . . . . . . . . . M . .
+. . . . . . . . . . . . . . . . M . . .
+. . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . .
+. . . M . . . . . Y Y . . . . . . . . .
+. . . . . . . . Y Y Y Y . . . . . . . .
+. . . . . . . . Y Y Y Y . . . . . . . .
+. . . . . . . . Y Y Y Y . . . M . . . .
+. . . . . . . . . Y Y . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . .
+. . . . M . . . . . . . . . . . . . . .
+. . . . . . . . M . . . . M . . . . . .
+. . M . . . . . . . . . M . . . . . . .
+. . . . . . . . . . . . . . . . M . . .
+. . . . . . . . . . M . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . .
+```
+
+**`boss_membrane_north (left; right = mirror; 28x28, spikes along the bottom edge)`** (28w x 28h, palette flesh_truth)
+```
+m m m m m m m . . . . . . . . . . . . . . . . . . . . .
+m m m m m m m m . . . . . . . . . . . . . . . . . . . .
+m m m m m m m m m . . . . . . . . . . . . . . . . . . .
+m m m m m m m m m m . . . . . . . . . . . . . . . . . .
+m m m m m m m m m m m . . . . . . . . . . . . . . . . .
+m m m m m m m m m m m m . . . . . . . . . . . . . . . .
+m m m m m m m m m m m m m . . . . . . . . . . . . . . .
+m m m m m m m m m m m m m m . . . . . . . . . . . . . .
+m m m m m m m m m m m m m m m . . . . . . . . . . . . .
+m m m m m m m m m m m m m m m m . . . . . . . . . . . .
+m m m m m m m m m m m m m m m m m . . . . . . . . . . .
+m m m m m m m m m m m m m m m m m m . . . . . . . . . .
+m m m m m m m m m m m m m m m m m m m . . . . . . . . .
+m m m m m m m m m m m m m m m m m m m m . . . . . . . .
+m m m m m m m m m m m m m m m m m m m m m . . . . . . .
+m m m m m m m m m m m m m m m m m m m m m m . . . . . .
+m m m m m m m m m m m m m m m m m m m m m m m . . . . .
+m m m m m m m m m m m m m m m m m m m m m m m m . . . .
+m m m m m m m m m m m m m m m m m m m m m m m m m . . .
+m m m m m m m m m m m m m m m m m m m m m m m m m m . .
+m m m m m m m m m m m m m m m m m m m m m m m m m m m .
+m m m m . . . m m m m . . . m m m m . . . m m m m . . .
+m m m m . . . m m m m . . . m m m m . . . m m m m . . .
+m m m m . . . m m m m . . . m m m m . . . m m m m . . .
+m m m m . . . m m m m . . . m m m m . . . m m m m . . .
+m m m m . . . m m m m . . . m m m m . . . m m m m . . .
+m m m m . . . m m m m . . . m m m m . . . m m m m . . .
+m m m m . . . m m m m . . . m m m m . . . m m m m . . .
+```
+
