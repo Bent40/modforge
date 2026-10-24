@@ -38,13 +38,13 @@ spec:
     heat:   { from: "Sense Heat Source 2 (3 mastered), Universal Perception 3", finds: "warm-blooded, heat blocks; not #cold_blooded/#no_blood; off in ultraWarm" }
     sound:  { from: "Sense Soundwave 2 (3 mastered), Universal Perception 3", finds: "not silent, not canBlockSoundDetect; sneaking -1" }
   concealment:                           # by type: what each blocks
-    magic:     { source: "tensura:presence_concealment value = level", blocks: magic, leak: "0.5 x level vs intent/heat/sound" }
-    cold_body: { source: "#cold_blooded, #no_blood, cold-blooded race", blocks: heat }
+    magic:     { source: "tensura:presence_concealment value = level (real: mask 0.5, most skills 1-3, Shadow Motion 5, Snatch/Ban 11)", blocks: magic, leak: "0.5 x level vs intent/heat; sound fully blocked at >= 2 (Tensura canBlockSoundDetect)" }
+    cold_body: { source: "#tensura:cold_blooded, #tensura:no_blood (incl. undead, slimes, arthropods), cold-blooded race", blocks: heat }
     silence:   { source: "silent, canBlockSoundDetect", blocks: sound }
     invisible: { counts_as: "+1 magic concealment" }
   reveal:                                # per channel
     power:  "level + 2 x log10(yourMaxEP / theirMaxEP)"
-    found:  "power >= concealment on that channel (unconcealed: no EP check, Tensura parity)"
+    found:  "power > concealment on that channel (strict, like Tensura S > C; unconcealed: no EP check)"
     margin: "best(power - needed) + 0.5 per extra channel"
     read:   "margin >= 1 full entry; 0..1 'Faint presence' (vague category, distance to 5 m, chip only)"
   things:                                # Beings / Things filter
@@ -70,7 +70,7 @@ spec:
     palette:  [ gold, bad_dk, warn_dk, ok_dk, mag_2, unknown_dk ]   # glow outline per category (ui-style-guide roles)
     particles: []
     geometry:
-      - { shape: outline, size: "entity silhouette", texture: none, emissive: true, layer: vanilla_outline }  # via SkillClientUtils.getGlowColor mixin
+      - { shape: outline, size: "entity silhouette", texture: none, emissive: true, layer: vanilla_outline }  # @ModifyReturnValue getGlowColor, priority 1500 (after mysticism / tr_unique_monsters / trnightmare); bypasses concealment's early -1 for revealed targets
     keyframes: [ {t:0,"list opens"}, {t:"double-click","tracked entity glows; HUD chip shows name, distance, arrow"} ]
     sounds:   [ {t:0, ui.button.click} ]
   integration:
