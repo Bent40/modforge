@@ -266,6 +266,11 @@ n     maw_void      #140408   base      mouths, eye sockets
 M     pustule_glow  #ff5a6e   emissive  pulsing nodes (always over a base cell)
 B     bile_glow     #c6e04a   emissive  bile sacs, bile projectiles
 Y     eye_glow      #ffe9a8   emissive  lidless eyes, heart valve
+h     flesh_shadow  #4a1a3a   base      hue-shifted shadow (purple), under folds and spines
+o     flesh_warm    #e89a7a   base      hue-shifted highlight (orange), wet sheen on bulges
+j     sinew_shadow  #8f6a4e   base      underside of spines and tendons
+i     bone_shadow   #b8a98a   base      bone in shade, rib undersides
+x     blood_bright  #b8202f   base      fresh blood, drip tips, wet vessel highlights
 ```
 Added for the heartling (7.2):
 ```
@@ -289,6 +294,11 @@ e     robe_blue     #6aa0d8   base      villager robe
 l     stem_green    #6fbf5a   base      flower stems
 q     petal_pink    #ffb3e6   base      blooms
 y     petal_gold    #ffe28a   base      blooms
+z     fur_cool      #b9c3d6   base      fur shadow (blue-grey, never plain grey)
+c     fur_warm      #fff6dc   base      fur highlight (cream), clump tips
+m     fur_marking   #8e8a96   base      saddle and mask markings on the wolf
+r     robe_shadow   #44709e   base      robe folds
+s     skin_shadow   #c48e72   base      villager skin in shade
 ```
 Per-entity tint variants multiply the fairy only: cyan `#9ff0ff`, pink `#ffb3e6`, gold `#ffe28a`.
 
@@ -302,6 +312,12 @@ Every mob in the biome follows the heartling's two-form recipe:
 - **Shared pivots.** Every glamour flourish hinges where a true spine hinges: fairy wings and heart spines, wolf tufts
   and hound hackles, flower stems and puppet quills. A glimpse (5.1) swaps form inside the same outline.
 - The boss is the motif at full size (Ben's drawing); the heartlings are its buds, so the whole roster reads as one organism.
+- **Detail rules for the mockup pass (Ben, 2026-10-24: "slightly monotone, the fur is just completely white").**
+  Every material is drawn as a 4-step **hue-shifted ramp**, not one colour: flesh `h -> d -> f -> p/o` (shadows
+  toward purple, highlights toward orange), fur `z -> a -> u -> c` (cool shadow, cream tips) with `m` markings,
+  sinew `j -> s`, bone `i -> b`, blood `r -> x`. No face may be a single flat colour larger than 3x3 except the
+  emissive eye. Fur reads as 2-3 px clumps with shadow on the underside, light from the top-left on every face.
+  The `solid <role>` faces in 7.1-7.6 are placeholders until this pass replaces them with full grids.
 - Cave mobs (stalker, weeper) have no glamour form. They are concealed instead, and they still carry the spines and the eye.
 
 ### 7.1 `flesh_hound` (disguise: storybook wolf)
