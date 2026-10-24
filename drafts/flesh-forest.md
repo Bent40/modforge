@@ -83,13 +83,15 @@ same choice Coercion and our Pressure skill make; `EnergyHelper.getMaxEP` is alr
 |---|---|---|---|
 | 0 | `deceived` | `effective_ep < notice_ep` (10,000, A-Rank) | full paradise; lures lead you; cave mobs shimmer almost invisibly |
 | 1 | `uneasy` | `notice_ep <= effective_ep < pierce_ep` | one System line on entry ("The magicule here beats like a pulse. Something is wrong with this forest."); rare one-frame flickers of the true texture on blocks and mobs; cave mobs a little more visible |
-| 2 | `lucid` | `effective_ep >= pierce_ep` (100,000, Special-A) | System line offers the break: "[Break the illusion]" (clickable) or hold sneak 3 s |
+| 2 | `lucid` | `effective_ep >= pierce_ep` (100,000, Special-A) **or** `SkillUtils.canSeeIllusion(player)` | System line offers the break: "[Break the illusion]" (clickable) or hold sneak 3 s |
 | 3 | `pierced` | lucid player who broke it (persistent per player) | the true flesh forest: true blocks, true mobs, true sounds, red fog. Lures turn hostile on sight |
 
 Skill multipliers (defaults; skill ids are the ones the questbook already grants):
 - `tensura:magic_sense` x2 (a 5k B-Rank with Magic Sense is uneasy)
-- `tensura:heavenly_eye` x5 (a 50k Heavenly Eye user reaches 250k: lucid, matching the questbook's "see through
-  illusions" promise)
+- **Tensura's own illusion rule (verified by javap, 2026-10-24, in the Detection list thread):**
+  `SkillUtils.canSeeIllusion` is `presence_sense >= 3.0`. Universal Perception and Godwolf Sense give 3, Heavenly
+  Eye gives 4. So any player Tensura already says can see illusions is `lucid` regardless of EP. This replaces the
+  earlier Heavenly Eye x5 multiplier idea and matches the questbook's "see through illusions" promise.
 - `tensura:sage` / `tensura:great_sage`: no multiplier; they change the copy (the uneasy line is spoken by
   [Sage]; Great Sage names the organism: "Analysis complete. This forest is a single living being.")
 
@@ -154,7 +156,9 @@ Build risks (spike these first, in order):
 2. Translucent entity rendering under Iris shaders: mobs going see-through under shaders is already a known
    deferred issue, so `stalker_alpha` may look different with shaders on. Fallback mode
    `stalker_visibility = particles_only` (no body, only shimmer particles) is in config.
-3. TerraBlender 4.1.0.8 `Region` API and surface rules: check by javap before writing the region class.
+3. `presence_concealment` is an entity attribute, not per-viewer: decide whether stalkers drop it when the
+   *nearest* player is pierced or only inside the heart chamber (default: chamber + when attacked by a pierced player).
+4. TerraBlender 4.1.0.8 `Region` API and surface rules: check by javap before writing the region class.
 
 ---
 
@@ -392,6 +396,9 @@ spec:
   archetype: biped
   axes: { forward: -Z, up: +Y, right: +X }
   visibility: { deceived: 0.15, uneasy: 0.45, lucid: 1.0, pierced: 1.0, mode: alpha | particles_only }
+  concealment: "attribute tensura:presence_concealment > 0 while any viewer is glamoured, so Magic Sense / detection
+                skills never glow it (verified: > 0 means never glows for any sense); set to 0 once the illusion breaks
+                for the target player or inside the heart chamber" 
   model:
     cuboids:
       - { bone: leg_left,  size:[4,18,4],  offset:[-4.5,0,-2], pivot:[-2.5,18,0], rot:[0,0,0],   parent: everything }
@@ -561,7 +568,7 @@ elixir instead gains blood-level progress.
 | `notice_ep` | 10000 | X: uneasy threshold (A-Rank) |
 | `pierce_ep` | 100000 | Y: lucid threshold (Special-A) |
 | `magic_sense_mult` | 2.0 | effective EP multiplier for `tensura:magic_sense` |
-| `heavenly_eye_mult` | 5.0 | effective EP multiplier for `tensura:heavenly_eye` |
+| `honor_tensura_can_see_illusion` | true | `SkillUtils.canSeeIllusion` (presence_sense >= 3) grants `lucid` |
 | `pierce_magicule_cost_fraction` | 0.05 | one-time magicule cost to break the illusion |
 | `pierce_hold_ticks` | 60 | sneak-hold length to break |
 | `tier_check_interval_ticks` | 40 | how often the server re-checks |
