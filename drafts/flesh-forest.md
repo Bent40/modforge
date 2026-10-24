@@ -1,6 +1,6 @@
 # DRAFT — The Flesh Forest (`flesh_forest`): an illusion biome gated by EP
 
-Status: **design draft, not built.** Requested by Ben 2026-10-24: a forest that looks idyllic and resource-rich
+Status: **design approved by Ben 2026-10-24 (section 12), not built.** Requested by Ben 2026-10-24: a forest that looks idyllic and resource-rich
 (fairies, villages, ore spires, friendly-looking wolves) and lures weak players into caves around the spires,
 where hard-to-see hostiles wait. Above X EP you sense something is wrong; above Y EP you can force yourself out
 of the illusion and see a flesh forest whose caves are pores converging on a heart boss. This sheet is the
@@ -81,8 +81,8 @@ same choice Coercion and our Pressure skill make; `EnergyHelper.getMaxEP` is alr
 
 | Tier | id | Condition (defaults) | What the player gets |
 |---|---|---|---|
-| 0 | `deceived` | `effective_ep < notice_ep` (10,000, A-Rank) | full paradise; lures lead you; cave mobs shimmer almost invisibly |
-| 1 | `uneasy` | `notice_ep <= effective_ep < pierce_ep` | one System line on entry ("The magicule here beats like a pulse. Something is wrong with this forest."); rare one-frame flickers of the true texture on blocks and mobs; cave mobs a little more visible |
+| 0 | `deceived` | `effective_ep < notice_ep` (10,000, A-Rank) | full paradise; lures lead you; cave mobs shimmer almost invisibly; **corner-of-the-eye glimpses** (5.1), rare |
+| 1 | `uneasy` | `notice_ep <= effective_ep < pierce_ep` | one System line on entry ("The magicule here beats like a pulse. Something is wrong with this forest."); corner-of-the-eye glimpses (5.1) about three times as often; cave mobs a little more visible |
 | 2 | `lucid` | `effective_ep >= pierce_ep` (100,000, Special-A) **or** `SkillUtils.canSeeIllusion(player)` | System line offers the break: "[Break the illusion]" (clickable) or hold sneak 3 s |
 | 3 | `pierced` | lucid player who broke it (persistent per player) | the true flesh forest: true blocks, true mobs, true sounds, red fog. Lures turn hostile on sight |
 
@@ -103,6 +103,8 @@ Hard overrides:
 - Tier only ever rises. Leaving and re-entering never re-deceives a pierced player.
 
 ### Intentional tells (rewards for paying attention, not bugs)
+- **Corner-of-the-eye glimpses** (Ben, 2026-10-24): the illusion slips at the edge of your vision for a split second
+  and is whole again when you look. This is the warning for low-EP players instead of a System message. See 5.1.
 - Glamoured loot can't be crafted with (a "diamond" that no recipe accepts).
 - Death messages always use the true name ("Ben was slain by a Flesh Hound").
 - Tensura appraisal/analysis skills read the true entity name.
@@ -149,6 +151,21 @@ Client side (`client` package, `Dist.CLIENT`):
   `stalker_alpha` (0.15 deceived, 0.45 uneasy, 1.0 lucid/pierced) plus a faint shimmer particle.
 - **Items:** glamoured items carry an item property `isekai_wilds:glamoured` (1 while the local tier is below
   `pierced`); the item model JSON overrides to the twin's model (diamond, gold ingot, emerald). Pure data.
+
+### 5.1 Corner-of-the-eye glimpses (client only)
+Decided by Ben 2026-10-24 instead of a last-chance warning. The glimpse is the only hint a deceived player gets.
+- **Mobs (the main glimpse):** each frame, a disguised entity whose direction from the camera is more than
+  `glimpse_min_angle` (40 degrees) off the view centre may, on a glimpse roll, draw its true model for
+  `glimpse_frames` (3 frames, about 50 ms at 60 fps). If the player turns toward it during the glimpse, it snaps
+  back at once. It never glimpses in the centre of the screen.
+- **Blocks (the cheap glimpse):** baked chunk models can't change per frame, so blocks don't swap. A GUI layer
+  flashes a flesh-texture vignette (`flesh_base`/`vein` from the palette, alpha 0.35) in one screen corner for the
+  same 3 frames. It reads as the world showing through at the edge of sight.
+- **Rate:** `glimpse_per_minute_deceived` 1, `glimpse_per_minute_uneasy` 3, rolled per player rather than per
+  mob, with at least 15 s between glimpses. None while pierced (nothing left to hide), none inside the heart chamber.
+- Paired with a quiet wet-heartbeat thump at 30% volume on the same frame, panned to the glimpse's side.
+- **Option:** `glimpse_mode = both | mobs_only | vignette_only | off`. `off` is there for players sensitive to
+  flashes.
 
 Build risks (spike these first, in order):
 1. `IllusionBakedModel` under **Sodium 0.8.12 + Iris 1.8.14** (both in the pack). Sodium on NeoForge honours
@@ -572,7 +589,10 @@ elixir instead gains blood-level progress.
 | `pierce_magicule_cost_fraction` | 0.05 | one-time magicule cost to break the illusion |
 | `pierce_hold_ticks` | 60 | sneak-hold length to break |
 | `tier_check_interval_ticks` | 40 | how often the server re-checks |
-| `uneasy_flicker_per_minute` | 2 | how often uneasy players glimpse the truth |
+| `glimpse_per_minute_deceived` / `_uneasy` | 1 / 3 | corner-of-the-eye glimpse rate (5.1) |
+| `glimpse_min_angle` | 40 | degrees off the view centre before a mob may glimpse |
+| `glimpse_frames` | 3 | glimpse length |
+| `glimpse_mode` | both | `both`, `mobs_only`, `vignette_only`, `off` |
 | `stalker_alpha_deceived` / `_uneasy` | 0.15 / 0.45 | cave mob visibility |
 | `stalker_visibility` | alpha | `alpha` or `particles_only` (shader fallback) |
 | `heart_chamber_forces_truth` | true | reveal on entering the heart chamber |
@@ -613,16 +633,14 @@ knight spider) in a test world. They are not tested.
 
 ---
 
-## 12. Decisions for Ben
+## 12. Decisions (Ben, 2026-10-24)
 
-1. **Thresholds**: X = 10,000 (A-Rank), Y = 100,000 (Special-A)? (recommended)
-2. **Reward default**: one `heart_core` with a choice of elixir (martial/body) or blood focus (recommended), or
-   pick one of them only.
-3. **Glamoured loot**: fake diamonds that turn out to be compost (recommended), or real ores as bait.
-4. **New mod `isekai_wilds`** (recommended), or fold into `isekai_beasts`.
-5. **Names**: glamour name "Gleaming Grove", true name "The Flesh Forest", boss "The Grove's Heart". Change any.
-6. **Low-EP deaths**: deceived players can wander into the pores and die fast. Keep it (the point of the trap)
-   or soften with a last-chance System warning at the first pore.
+1. **Thresholds:** approved: X = 10,000 (A-Rank), Y = 100,000 (Special-A), plus Tensura's own `canSeeIllusion`.
+2. **Reward:** both crafts approved. One `heart_core` makes either the elixir (martial/body) or the blood focus.
+3. **Glamoured loot:** fake. Diamonds that turn out to be compost.
+4. **Mod:** a new mod, `isekai_wilds`.
+5. **Low-EP deaths:** the trap stays lethal. The warning is corner-of-the-eye glimpses (5.1), not a System message.
+6. Still open (defaults stand unless changed): names "Gleaming Grove" / "The Flesh Forest" / "The Grove's Heart".
 
 ---
 
