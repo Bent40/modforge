@@ -1,7 +1,8 @@
 # DRAFT — `presence_detection` (spell lane, Tensura skill + screen)
 
 *Draft 2026-10-24 (v2 after Ben's feedback: renamed from sense_index, unlock confirmed, concealment by type, things
-in general). Awaiting mockup approval; nothing built. Full design, javap evidence and tunables: isekai-chronicles
+in general). **Approved and built** as magicule_standard 2.7.0 (2026-10-24); hostility marker + pins added in
+2.7.1 (2026-10-25). Code: isekai-chronicles PR #10. Full design, javap evidence and tunables: isekai-chronicles
 `docs/presence-detection-design.md`; mockups `docs/ui/presence-detection/`.*
 
 This is the first spec for a **Tensura-hosted skill** (`host: tensura`) and the first to carry a screen. The
@@ -125,6 +126,30 @@ verify:
   - double-click tracks: glow outline + HUD chip with live distance; 25 per 5 s; "Lost the trail" after 10 s out of range
   - in-game screenshot matches docs/ui/presence-detection mockups at GUI scale 3 and fits 320x240
   - javap: common classes have no net/minecraft/client refs; one active magicule_standard jar
+```
+
+## 2.7.1 additions (Ben 2026-10-25)
+
+```
+spec:
+  importance:
+    hostile_bonus: 300                  # hostile toward you = targeting you, or Enemy/#tensura:hostile_monster not yours
+    hunting_bonus: 200                  # a mob hunting you in a row not already "Hunting you" (Unknown, Faint, Boss)
+  pins:
+    input:    "right-click a being, or select + Pin button"
+    effect:   "glows in its category colour while detected, list open or closed (same reveal rule)"
+    storage:  "player PlayerPersisted data, by entity UUID (survives relog + death)"
+    max:      8                         # new pin replaces the oldest out-of-sight one; refused if all 8 in sight
+    upkeep:   "5 magicule per detected pin per 5 s; own subordinates free"
+gui:
+  row_hostile: "fill #D6B4AE + red warning triangle after the name + category word (never tint alone)"
+  row_pinned:  "gold pin mark; pinned rows on top in either sort"
+  show_filter: [All, Hostile, Beings, Things]
+  footer:      "Pinned n/8 · [Pin|Unpin 44px] [Track|Stop tracking 84px]"
+verify:
+  - hostile zombie scores above a neutral wolf; own aggressive wolf reads Ally, not hostile
+  - Unknown hunting you outranks an idle Unknown (1530 vs 1330)
+  - pinned mob glows with the list closed; unpinning restores Tensura's colour; pins survive relog
 ```
 
 ## Gaps this draft exposes in Modforge
