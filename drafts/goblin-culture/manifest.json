@@ -1,0 +1,108 @@
+[
+ {
+  "id": "goblin_hut",
+  "nbt": "structures/goblin/goblin_hut.nbt",
+  "size": [
+   9,
+   9,
+   9
+  ],
+  "states": 21,
+  "blocks": {
+   "minecraft:cobblestone": 8,
+   "minecraft:mossy_cobblestone": 9,
+   "minecraft:packed_mud": 27,
+   "minecraft:coarse_dirt": 17,
+   "minecraft:rooted_dirt": 1,
+   "minecraft:spruce_fence": 2,
+   "minecraft:spruce_door": 2,
+   "minecraft:mud_bricks": 8,
+   "minecraft:stripped_spruce_log": 12,
+   "minecraft:air": 98,
+   "minecraft:barrel": 1,
+   "minecraft:campfire": 1,
+   "minecraft:brown_carpet": 3,
+   "minecraft:wall_torch": 1,
+   "minecraft:spruce_trapdoor": 2,
+   "minecraft:skeleton_skull": 1,
+   "minecraft:spruce_slab": 20,
+   "minecraft:spruce_log": 16,
+   "minecraft:hay_block": 37
+  },
+  "previews": [
+   "previews/goblin_hut_front.png",
+   "previews/goblin_hut_back.png",
+   "previews/goblin_hut_cutaway.png"
+  ]
+ },
+ {
+  "id": "goblin_chief_hall",
+  "nbt": "structures/goblin/goblin_chief_hall.nbt",
+  "size": [
+   9,
+   10,
+   15
+  ],
+  "states": 29,
+  "blocks": {
+   "minecraft:cobblestone": 25,
+   "minecraft:mossy_cobblestone": 13,
+   "minecraft:rooted_dirt": 8,
+   "minecraft:coarse_dirt": 42,
+   "minecraft:packed_mud": 73,
+   "minecraft:spruce_fence": 4,
+   "minecraft:stripped_spruce_log": 52,
+   "minecraft:spruce_door": 2,
+   "minecraft:air": 360,
+   "minecraft:brown_carpet": 7,
+   "minecraft:light_gray_carpet": 1,
+   "minecraft:campfire": 1,
+   "minecraft:mud_bricks": 16,
+   "minecraft:barrel": 2,
+   "minecraft:spruce_stairs": 1,
+   "minecraft:spruce_trapdoor": 6,
+   "minecraft:skeleton_skull": 2,
+   "minecraft:wall_torch": 4,
+   "minecraft:spruce_slab": 30,
+   "minecraft:spruce_log": 36,
+   "minecraft:hay_block": 105,
+   "minecraft:spruce_planks": 11,
+   "minecraft:stripped_spruce_wood": 7,
+   "minecraft:brown_wall_banner": 1
+  },
+  "previews": [
+   "previews/goblin_chief_hall_front.png",
+   "previews/goblin_chief_hall_back.png",
+   "previews/goblin_chief_hall_cutaway.png"
+  ]
+ },
+ {
+  "id": "goblin_watchtower",
+  "nbt": "structures/goblin/goblin_watchtower.nbt",
+  "size": [
+   7,
+   13,
+   7
+  ],
+  "states": 14,
+  "blocks": {
+   "minecraft:mossy_cobblestone": 1,
+   "minecraft:cobblestone": 4,
+   "minecraft:stripped_spruce_log": 41,
+   "minecraft:air": 131,
+   "minecraft:ladder": 6,
+   "minecraft:brown_wall_banner": 1,
+   "minecraft:spruce_planks": 21,
+   "minecraft:spruce_fence": 12,
+   "minecraft:skeleton_skull": 1,
+   "minecraft:wall_torch": 2,
+   "minecraft:spruce_slab": 24,
+   "minecraft:hay_block": 25
+  },
+  "previews": [
+   "previews/goblin_watchtower_front.png",
+   "previews/goblin_watchtower_back.png",
+   "previews/goblin_watchtower_cutaway.png"
+  ]
+ }
+]

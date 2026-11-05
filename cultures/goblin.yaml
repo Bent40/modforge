@@ -1,0 +1,65 @@
+# Culture spec: goblin. Lane: culture (lanes/culture.md). Generator: tools/culturegen.
+# Blocks are named by ROLE. Buildings reference roles, never block ids, so a reskin is a palette edit.
+type: culture
+content_id: goblin
+modid: isekai_kingdoms
+display_name: "Goblin"
+build_target: structure_nbt
+host: tensura
+spec:
+  lore: >
+    Unnamed goblins of the Jura forest: a poor, frightened tribe. Huts of mud packed between spruce
+    posts, hay thatch, no glass, a fire in the middle of the floor. Skulls of beasts they have beaten
+    hang on posts as a warning. (Tensura vol. 1 / anime ep. 2-3, the village Rimuru first visits;
+    my recall, not re-verified.) Named goblins (hobgoblins) build better; that is a later tier.
+  tier: wild            # wild = unnamed tribe. Later tiers (named, kingdom) reuse the roles with upgrades.
+  front: north          # every building faces -Z (z = 0 side); jigsaw rotation handles the rest
+  palette:              # role -> weighted blocks. Weights mix weathering; the first entry is the main block.
+    foundation: { minecraft:cobblestone: 5, minecraft:mossy_cobblestone: 3 }
+    wall:       { minecraft:packed_mud: 7, minecraft:mud_bricks: 2, minecraft:coarse_dirt: 1 }
+    frame:      { minecraft:stripped_spruce_log: 1 }
+    beam:       { minecraft:spruce_log: 1 }
+    floor:      { minecraft:coarse_dirt: 4, minecraft:packed_mud: 2, minecraft:rooted_dirt: 1 }
+    deck:       { minecraft:spruce_planks: 1 }
+    gable:      { minecraft:spruce_planks: 3, minecraft:stripped_spruce_wood: 1 }
+    thatch:     { minecraft:hay_block: 1 }
+    eave:       { minecraft:spruce_slab: 1 }
+    trim:       { minecraft:spruce_fence: 1 }
+    door:       { minecraft:spruce_door: 1 }
+    shutter:    { minecraft:spruce_trapdoor: 1 }
+    climb:      { minecraft:ladder: 1 }
+    light:      { minecraft:wall_torch: 1 }
+    hearth:     { minecraft:campfire: 1 }
+    bedding:    { minecraft:brown_carpet: 3, minecraft:light_gray_carpet: 1 }   # hides, not beds
+    storage:    { minecraft:barrel: 1 }
+    seat:       { minecraft:spruce_stairs: 1 }
+    banner:     { minecraft:brown_wall_banner: 1 }
+    trophy:     { minecraft:skeleton_skull: 1 }
+  banner_pattern: [ { pattern: minecraft:skull, color: white } ]   # the tribe sign
+  rules:
+    glass: never                 # goblins do not glaze; windows are holes with shutters
+    roof: thatch_stepped         # hay steps, one-block overhang, spruce slab eave
+    overhang: 1
+    frame: posts_at_corners_and_every_4
+    motif: bone_totem            # the one small detail: fence post topped by a beast skull by the door
+    light_level: dim             # torches by doors only; the hearth lights the inside
+  buildings:
+    - id: goblin_hut
+      display_name: "Goblin Hut"
+      form: round_hut
+      role_in_village: dwelling (most common piece)
+      params: { diameter: 7, wall_height: 3 }
+    - id: goblin_chief_hall
+      display_name: "Chief's Longhouse"
+      form: long_hall
+      role_in_village: centre piece, one per village
+      params: { width: 7, length: 13, wall_height: 4, post_spacing: 4 }
+    - id: goblin_watchtower
+      display_name: "Goblin Watchtower"
+      form: stilt_tower
+      role_in_village: edge piece, 1-2 per village
+      params: { width: 5, deck_height: 6, rail_height: 1, roof_height: 3 }
+verify:
+  - "Each .nbt loads in a structure block (Load mode, name isekai_kingdoms:goblin/<id>) on the test client with no missing-block warnings."
+  - "Placed piece: door faces north, no floating blocks, fences connect, torches attached, interior is air (no terrain left inside)."
+  - "Totem skull and the tribe banner (white skull on brown) render."
