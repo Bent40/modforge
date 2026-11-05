@@ -1,0 +1,32 @@
+{
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 4,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "isekai_wilds:goblin/goblin_street",
+        "projection": "terrain_matching",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "isekai_wilds:goblin/goblin_street_bend_left",
+        "projection": "terrain_matching",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "isekai_wilds:goblin/goblin_street_bend_right",
+        "projection": "terrain_matching",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}

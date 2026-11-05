@@ -39,7 +39,7 @@ def sheet(out_dir, doc, path):
         d.text((pad, y), f"{b['display_name']}  ({e['id']}, {sx}x{sy}x{sz}, {b['role_in_village']})",
                font=_font(18), fill="#e8d27a")
         x = pad
-        for lab, im in zip(("front (north = door side)", "back", "cutaway (roof off)"), ims):
+        for lab, im in zip(("front (north = door side)", "back", "cutaway (roof off)")[:len(ims)], ims):
             img.paste(im, (x, y + 28))
             d.text((x + 6, y + 32), lab, font=_font(13), fill="#9aa0aa")
             x += im.width + pad

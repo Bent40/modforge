@@ -42,6 +42,9 @@ LOOK = {
     "minecraft:barrel": ("planks", "#6a4e2e", "#4f3a22", "#86653c"),
     "minecraft:brown_wall_banner": ("banner", "#72472a", "#633d22", "#e8e6dc"),
     "minecraft:skeleton_skull": ("skull", "#c9c8b6", "#a8a796", "#2c2c2c"),
+    "minecraft:crafting_table": ("planks", "#8a6a3e", "#5b4226", "#a07c4a"),
+    "minecraft:smoker": ("cobble", "#5a5450", "#3e3a36", "#7a6e66"),
+    "minecraft:dirt_path": ("noise", "#94753f", "#7e6234", "#a8884e"),
     GRASS: ("grass", "#6a9a3c", "#5a8632", "#86603f"),
     FLAME: ("flat", "#ffcf4a", "#ffcf4a", "#ffcf4a"),
 }
@@ -178,6 +181,9 @@ def _transform(cells, view):
 
 def render(grid, path, view="front", cut_y=None, scale=3, ground=True):
     cells = {k: v for k, v in grid.cells.items() if cut_y is None or k[1] < cut_y}
+    for k, (b, p) in list(cells.items()):  # jigsaws render as what they become
+        if b == "minecraft:jigsaw":
+            cells[k] = (grid.block_entities[k]["final_state"], {})
     cells = _transform(cells, view)
     if ground:
         xs = [p[0] for p in cells]

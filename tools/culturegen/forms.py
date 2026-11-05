@@ -58,6 +58,27 @@ def _banner(g, pal, x, y, z, facing, pattern):
     g.block_entities[(x, y, z)] = {"id": "minecraft:banner", "patterns": [dict(p) for p in pattern]}
 
 
+def _ns(culture, name):
+    return f"{culture['_ns']}:{name}"
+
+
+def _pool(culture, pool):
+    return f"{culture['_ns']}:{culture['_race']}/{pool}"
+
+
+def _jigsaw(g, x, y, z, facing, name, target="minecraft:empty", pool="minecraft:empty",
+            final="minecraft:air", joint="aligned"):
+    """Jigsaw connector. A child connects where its `name` equals the parent's `target`; facings end opposite."""
+    g.set(x, y, z, "minecraft:jigsaw", orientation=f"{facing}_up")
+    g.block_entities[(x, y, z)] = {"id": "minecraft:jigsaw", "name": name, "target": target, "pool": pool,
+                                   "final_state": final, "joint": joint,
+                                   "selection_priority": 0, "placement_priority": 0}
+
+
+def _entrance(g, culture, x, z, kind="building_entrance", final="minecraft:dirt_path"):
+    _jigsaw(g, x, 0, z, "north", _ns(culture, kind), final=final)
+
+
 def round_hut(p, pal, culture):
     D, H = p["diameter"], p["wall_height"]
     o = 1  # overhang margin
@@ -119,6 +140,7 @@ def round_hut(p, pal, culture):
     # outside: torch right of door, totem left of door
     _torch(g, pal, W(door[0] + 1), 2, W(door[1]) - 1, "north")
     _totem(g, pal, W(door[0] - 2), W(0) - 1)
+    _entrance(g, culture, W(door[0]), W(0) - 1)
     return g, {"cut_y": 3}
 
 
@@ -189,6 +211,7 @@ def long_hall(p, pal, culture):
     _totem(g, pal, xm - 3, z0 - 1)
     _totem(g, pal, xm + 3, z0 - 1)
     _banner(g, pal, xm, yb + 2, z0 - 1, "north", culture["banner_pattern"])
+    _entrance(g, culture, xm, z0 - 1, kind="hall_entrance")
     return g, {"cut_y": 3}
 
 
@@ -247,7 +270,105 @@ def stilt_tower(p, pal, culture):
     _torch(g, pal, m, Dh + 2, m - 1, "north")
     _banner(g, pal, mid, Dh - 1, -1, "north", culture["banner_pattern"])
     g.set(mid, Dh - 1, 0, pal.main("deck"))  # banner backing board
+    _entrance(g, culture, mid, -1)
     return g, {"cut_y": Dh + 2}
 
 
-FORMS = {"round_hut": round_hut, "long_hall": long_hall, "stilt_tower": stilt_tower}
+def lean_to(p, pal, culture):
+    """Open-fronted work shed: low front posts, mud back wall, mono-pitch thatch falling to the front."""
+    Wd, D = p["width"], p["depth"]
+    m, b = Wd - 1, D - 1
+    g = Grid()
+    for x in range(Wd):
+        for z in range(D):
+            _role(g, pal, x, 0, z, "foundation" if z == b or x in (0, m) else "floor")
+    for x in (0, m):
+        for y in (1, 2):
+            _log(g, pal, x, y, 0)
+        for y in (1, 2, 3):
+            _log(g, pal, x, y, b)
+        for z in range(1, b):
+            _role(g, pal, x, 1, z, "wall")
+    for x in range(1, m):
+        for y in (1, 2, 3):
+            _role(g, pal, x, y, b, "wall")
+    split = (D + 1) // 2  # front half low, back half one higher
+    for x in range(-1, Wd + 1):
+        g.set(x, 3, -1, pal.main("eave"), type="bottom", waterlogged="false")
+        for z in range(0, split):
+            g.set(x, 3, z, pal.main("thatch"), axis="x")
+        for z in range(split, D):
+            g.set(x, 4, z, pal.main("thatch"), axis="x")
+        g.set(x, 4, D, pal.main("eave"), type="bottom", waterlogged="false")
+    for x in range(1, m):
+        for z in range(0, b):
+            for y in (1, 2):
+                g.air(x, y, z)
+        for z in range(split, b):
+            g.air(x, 3, z)
+    g.set(1, 1, b - 1, pal.main("workbench"))
+    g.set(2, 1, b - 1, pal.main("smoker"), facing="north", lit="false")
+    g.set(m - 1, 1, b - 1, pal.main("storage"), facing="up", open="false")
+    _totem(g, pal, Wd + 1, -1)
+    _entrance(g, culture, Wd // 2, -1)
+    return g, {"cut_y": 3}
+
+
+def plaza(p, pal, culture):
+    """Village start piece: trampled ground, sunken fire pit, stump stools, four bone totems, four exits."""
+    S = p["size"]
+    m, c = S - 1, S // 2
+    g = Grid()
+    for x in range(S):
+        for z in range(S):
+            d = max(abs(x - c), abs(z - c))
+            if (x, z) in ((0, 0), (0, m), (m, 0), (m, m)):
+                continue
+            _role(g, pal, x, 0, z, "path" if d <= 1 or x == c or z == c else "floor")
+            for y in (1, 2, 3):
+                g.air(x, y, z)
+    for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)):
+        _role(g, pal, c + dx, 0, c + dz, "foundation")
+    g.set(c, 0, c, pal.main("hearth"), facing="south", lit="true", signal_fire="false", waterlogged="false")
+    for dx, dz in ((-3, -2), (3, -2), (-3, 2), (3, 2), (-2, 3), (2, 3)):
+        _log(g, pal, c + dx, 1, c + dz)
+    for x, z in ((1, 1), (m - 1, 1), (1, m - 1), (m - 1, m - 1)):
+        for y in (1, 2, 3):
+            g.cells.pop((x, y, z), None)
+        _totem(g, pal, x, z)
+    streets, chief = _pool(culture, "streets"), _pool(culture, "chief")
+    exit_ = _ns(culture, "street_exit")
+    _jigsaw(g, c, 0, 0, "north", exit_, _ns(culture, "street"), streets, final=pal.main("path"))
+    _jigsaw(g, 0, 0, c, "west", exit_, _ns(culture, "street"), streets, final=pal.main("path"))
+    _jigsaw(g, m, 0, c, "east", exit_, _ns(culture, "street"), streets, final=pal.main("path"))
+    _jigsaw(g, c, 0, m, "south", exit_, _ns(culture, "hall_entrance"), chief, final=pal.main("path"))
+    return g, {"cut_y": None}
+
+
+def street(p, pal, culture):
+    """Terrain-matching path. kind straight: exits ahead + houses both sides; bend_left/right: turns 90 degrees."""
+    kind, L = p.get("kind", "straight"), p.get("length", 9)
+    g = Grid()
+    streets, houses = _pool(culture, "streets"), _pool(culture, "houses")
+    if kind == "straight":
+        cells = [(x, z) for x in range(3) for z in range(L)]
+    else:
+        cells = [(x, z) for x in range(3) for z in range(3)]
+    for x, z in cells:
+        _role(g, pal, x, 0, z, "path")
+    path = pal.main("path")
+    _jigsaw(g, 1, 0, 0, "north", _ns(culture, "street"), final=path)
+    if kind == "straight":
+        _jigsaw(g, 1, 0, L - 1, "south", _ns(culture, "street_exit"), _ns(culture, "street"), streets, final=path)
+        _jigsaw(g, 0, 0, L // 2, "west", _ns(culture, "street_side"), _ns(culture, "building_entrance"), houses, final=path)
+        _jigsaw(g, 2, 0, L // 2, "east", _ns(culture, "street_side"), _ns(culture, "building_entrance"), houses, final=path)
+    else:
+        out, side = ("east", "west") if kind == "bend_left" else ("west", "east")
+        ox, sx = (2, 0) if out == "east" else (0, 2)
+        _jigsaw(g, ox, 0, 1, out, _ns(culture, "street_exit"), _ns(culture, "street"), streets, final=path)
+        _jigsaw(g, 1, 0, 2, "south", _ns(culture, "street_side"), _ns(culture, "building_entrance"), houses, final=path)
+    return g, {"cut_y": None}
+
+
+FORMS = {"round_hut": round_hut, "long_hall": long_hall, "stilt_tower": stilt_tower, "lean_to": lean_to,
+         "plaza": plaza, "street": street}

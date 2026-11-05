@@ -2,7 +2,7 @@
 # Blocks are named by ROLE. Buildings reference roles, never block ids, so a reskin is a palette edit.
 type: culture
 content_id: goblin
-modid: isekai_kingdoms
+modid: isekai_wilds          # world-gen data home (see drafts/goblin-culture/WORLDGEN.md)
 display_name: "Goblin"
 build_target: structure_nbt
 host: tensura
@@ -35,6 +35,9 @@ spec:
     seat:       { minecraft:spruce_stairs: 1 }
     banner:     { minecraft:brown_wall_banner: 1 }
     trophy:     { minecraft:skeleton_skull: 1 }
+    path:       { minecraft:dirt_path: 5, minecraft:coarse_dirt: 2, minecraft:packed_mud: 1 }
+    workbench:  { minecraft:crafting_table: 1 }
+    smoker:     { minecraft:smoker: 1 }       # goblins smoke their meat
   banner_pattern: [ { pattern: minecraft:skull, color: white } ]   # the tribe sign
   rules:
     glass: never                 # goblins do not glaze; windows are holes with shutters
@@ -59,7 +62,48 @@ spec:
       form: stilt_tower
       role_in_village: edge piece, 1-2 per village
       params: { width: 5, deck_height: 6, rail_height: 1, roof_height: 3 }
+    - id: goblin_lean_to
+      display_name: "Goblin Work Shed"
+      form: lean_to
+      role_in_village: workshop, common
+      params: { width: 5, depth: 4 }
+    - id: goblin_plaza
+      display_name: "Fire Circle"
+      form: plaza
+      role_in_village: village start piece (centre)
+      params: { size: 11 }
+    - id: goblin_street
+      display_name: "Trampled Path"
+      form: street
+      role_in_village: street, houses on both sides
+      params: { kind: straight, length: 9 }
+    - id: goblin_street_bend_left
+      display_name: "Path Bend (left)"
+      form: street
+      role_in_village: street turn
+      params: { kind: bend_left }
+    - id: goblin_street_bend_right
+      display_name: "Path Bend (right)"
+      form: street
+      role_in_village: street turn
+      params: { kind: bend_right }
+  village:                         # jigsaw world gen (vanilla data, no Java)
+    structure: goblin_camp
+    biomes: ["#minecraft:is_forest", "#minecraft:is_taiga"]   # Tensura Jura biomes to add once ids are read from the jar
+    spacing: 40                     # chunks between attempts; tune
+    separation: 16
+    salt: 1937204512
+    size: 5                         # jigsaw depth: plaza -> streets -> houses
+    max_distance_from_center: 64
+    terrain_adaptation: beard_thin
+    pools:                          # pool -> { building id: weight }
+      center:  { goblin_plaza: 1 }
+      chief:   { goblin_chief_hall: 1 }
+      streets: { goblin_street: 4, goblin_street_bend_left: 1, goblin_street_bend_right: 1 }
+      houses:  { goblin_hut: 6, goblin_lean_to: 3, goblin_watchtower: 1 }
+    terrain_matching: [ goblin_street, goblin_street_bend_left, goblin_street_bend_right ]
 verify:
-  - "Each .nbt loads in a structure block (Load mode, name isekai_kingdoms:goblin/<id>) on the test client with no missing-block warnings."
+  - "Each .nbt loads in a structure block (Load mode, name isekai_wilds:goblin/<id>) on the test client with no missing-block warnings."
   - "Placed piece: door faces north, no floating blocks, fences connect, torches attached, interior is air (no terrain left inside)."
   - "Totem skull and the tribe banner (white skull on brown) render."
+  - "/locate structure isekai_wilds:goblin_camp finds a camp in a forest; it has the fire circle, the chief's hall on its south side, paths with huts, sheds and a tower, and no jigsaw blocks left behind."
