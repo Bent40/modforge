@@ -1,0 +1,354 @@
+style: goblin
+tone_by_suffix:
+  _a: a
+  _b: b
+  _d: d
+  _w: w
+fallback_tone: a
+notes: 'Tone map (by measured face brightness: MineColonies w>a>b>d, Tensura light>mid>dark>dark_goblin): w=light a=mid b=dark d=dark_goblin. Tints from Tensura entity_config.toml goblin*Colors. Layer order
+  = GoblinRenderer: skin, face, hair, clothing(loin, BottomColor), bandages, head(HeadColor), top(TopColor), bottom(BottomColor).'
+skins:
+- gender: male
+  tone: w
+  outfit: 0
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/light_male.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_a.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_short_male.png
+    tint: '#1d1d1d'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#4b2e1f'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_vest.png
+    tint: '#8b4513'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#4b2e1f'
+- gender: male
+  tone: w
+  outfit: 1
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/light_male.png
+  - path: assets/tensura/textures/entity/goblin/male/faces/face_c.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_bandana_male.png
+    tint: '#4b3120'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#222222'
+  - path: assets/tensura/textures/entity/goblin/unisex/bandages.png
+  - path: assets/tensura/textures/entity/goblin/unisex/head/head_bandana.png
+    tint: '#ddd5b8'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#228b22'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_pants.png
+    tint: '#555555'
+- gender: male
+  tone: w
+  outfit: 2
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/light_male.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_e.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_long_male.png
+    tint: '#5a5a5a'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#8b6b4f'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#8b6b4f'
+- gender: male
+  tone: a
+  outfit: 0
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/mid_male.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_a.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_short_male.png
+    tint: '#1d1d1d'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#4b2e1f'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_vest.png
+    tint: '#8b4513'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#4b2e1f'
+- gender: male
+  tone: a
+  outfit: 1
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/mid_male.png
+  - path: assets/tensura/textures/entity/goblin/male/faces/face_c.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_bandana_male.png
+    tint: '#4b3120'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#222222'
+  - path: assets/tensura/textures/entity/goblin/unisex/bandages.png
+  - path: assets/tensura/textures/entity/goblin/unisex/head/head_bandana.png
+    tint: '#ddd5b8'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#228b22'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_pants.png
+    tint: '#555555'
+- gender: male
+  tone: a
+  outfit: 2
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/mid_male.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_e.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_long_male.png
+    tint: '#5a5a5a'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#8b6b4f'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#8b6b4f'
+- gender: male
+  tone: b
+  outfit: 0
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/dark_male.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_a.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_short_male.png
+    tint: '#1d1d1d'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#4b2e1f'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_vest.png
+    tint: '#8b4513'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#4b2e1f'
+- gender: male
+  tone: b
+  outfit: 1
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/dark_male.png
+  - path: assets/tensura/textures/entity/goblin/male/faces/face_c.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_bandana_male.png
+    tint: '#4b3120'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#222222'
+  - path: assets/tensura/textures/entity/goblin/unisex/bandages.png
+  - path: assets/tensura/textures/entity/goblin/unisex/head/head_bandana.png
+    tint: '#ddd5b8'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#228b22'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_pants.png
+    tint: '#555555'
+- gender: male
+  tone: b
+  outfit: 2
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/dark_male.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_e.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_long_male.png
+    tint: '#5a5a5a'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#8b6b4f'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#8b6b4f'
+- gender: male
+  tone: d
+  outfit: 0
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/dark_goblin_male.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_a.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_short_male.png
+    tint: '#1d1d1d'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#4b2e1f'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_vest.png
+    tint: '#8b4513'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#4b2e1f'
+- gender: male
+  tone: d
+  outfit: 1
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/dark_goblin_male.png
+  - path: assets/tensura/textures/entity/goblin/male/faces/face_c.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_bandana_male.png
+    tint: '#4b3120'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#222222'
+  - path: assets/tensura/textures/entity/goblin/unisex/bandages.png
+  - path: assets/tensura/textures/entity/goblin/unisex/head/head_bandana.png
+    tint: '#ddd5b8'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#228b22'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_pants.png
+    tint: '#555555'
+- gender: male
+  tone: d
+  outfit: 2
+  layers:
+  - path: assets/tensura/textures/entity/goblin/male/skin/dark_goblin_male.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_e.png
+  - path: assets/tensura/textures/entity/goblin/male/hair/hair_long_male.png
+    tint: '#5a5a5a'
+  - path: assets/tensura/textures/entity/goblin/male/clothing/loin_male.png
+    tint: '#8b6b4f'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#8b6b4f'
+- gender: female
+  tone: w
+  outfit: 0
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/light_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_b.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_long_female.png
+    tint: '#4b3120'
+  - path: assets/tensura/textures/entity/goblin/female/clothing/loin_female.png
+    tint: '#4b2e1f'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_vest.png
+    tint: '#8b4513'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#4b2e1f'
+- gender: female
+  tone: w
+  outfit: 1
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/light_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_d.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_short_female.png
+    tint: '#1d1d1d'
+  - path: assets/tensura/textures/entity/goblin/unisex/head/head_bandana_full.png
+    tint: '#ffffff'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#800080'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_pants.png
+    tint: '#555555'
+- gender: female
+  tone: w
+  outfit: 2
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/light_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_a.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_bandana_female.png
+    tint: '#ebc07a'
+  - path: assets/tensura/textures/entity/goblin/female/clothing/loin_female.png
+    tint: '#8b6b4f'
+  - path: assets/tensura/textures/entity/goblin/unisex/bandages.png
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#ddd5b8'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#222222'
+- gender: female
+  tone: a
+  outfit: 0
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/mid_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_b.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_long_female.png
+    tint: '#4b3120'
+  - path: assets/tensura/textures/entity/goblin/female/clothing/loin_female.png
+    tint: '#4b2e1f'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_vest.png
+    tint: '#8b4513'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#4b2e1f'
+- gender: female
+  tone: a
+  outfit: 1
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/mid_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_d.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_short_female.png
+    tint: '#1d1d1d'
+  - path: assets/tensura/textures/entity/goblin/unisex/head/head_bandana_full.png
+    tint: '#ffffff'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#800080'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_pants.png
+    tint: '#555555'
+- gender: female
+  tone: a
+  outfit: 2
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/mid_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_a.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_bandana_female.png
+    tint: '#ebc07a'
+  - path: assets/tensura/textures/entity/goblin/female/clothing/loin_female.png
+    tint: '#8b6b4f'
+  - path: assets/tensura/textures/entity/goblin/unisex/bandages.png
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#ddd5b8'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#222222'
+- gender: female
+  tone: b
+  outfit: 0
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/dark_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_b.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_long_female.png
+    tint: '#4b3120'
+  - path: assets/tensura/textures/entity/goblin/female/clothing/loin_female.png
+    tint: '#4b2e1f'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_vest.png
+    tint: '#8b4513'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#4b2e1f'
+- gender: female
+  tone: b
+  outfit: 1
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/dark_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_d.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_short_female.png
+    tint: '#1d1d1d'
+  - path: assets/tensura/textures/entity/goblin/unisex/head/head_bandana_full.png
+    tint: '#ffffff'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#800080'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_pants.png
+    tint: '#555555'
+- gender: female
+  tone: b
+  outfit: 2
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/dark_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_a.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_bandana_female.png
+    tint: '#ebc07a'
+  - path: assets/tensura/textures/entity/goblin/female/clothing/loin_female.png
+    tint: '#8b6b4f'
+  - path: assets/tensura/textures/entity/goblin/unisex/bandages.png
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#ddd5b8'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#222222'
+- gender: female
+  tone: d
+  outfit: 0
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/dark_goblin_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_b.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_long_female.png
+    tint: '#4b3120'
+  - path: assets/tensura/textures/entity/goblin/female/clothing/loin_female.png
+    tint: '#4b2e1f'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_vest.png
+    tint: '#8b4513'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#4b2e1f'
+- gender: female
+  tone: d
+  outfit: 1
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/dark_goblin_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_d.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_short_female.png
+    tint: '#1d1d1d'
+  - path: assets/tensura/textures/entity/goblin/unisex/head/head_bandana_full.png
+    tint: '#ffffff'
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#800080'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_pants.png
+    tint: '#555555'
+- gender: female
+  tone: d
+  outfit: 2
+  layers:
+  - path: assets/tensura/textures/entity/goblin/female/skin/dark_goblin_female.png
+  - path: assets/tensura/textures/entity/goblin/unisex/faces/face_a.png
+  - path: assets/tensura/textures/entity/goblin/female/hair/hair_bandana_female.png
+    tint: '#ebc07a'
+  - path: assets/tensura/textures/entity/goblin/female/clothing/loin_female.png
+    tint: '#8b6b4f'
+  - path: assets/tensura/textures/entity/goblin/unisex/bandages.png
+  - path: assets/tensura/textures/entity/goblin/unisex/top/chest_tshirt.png
+    tint: '#ddd5b8'
+  - path: assets/tensura/textures/entity/goblin/unisex/bottom/legs_shorts.png
+    tint: '#222222'
