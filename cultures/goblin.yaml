@@ -87,15 +87,21 @@ spec:
       form: street
       role_in_village: street turn
       params: { kind: bend_right }
+  inhabitants:                      # mobs saved into the .nbt, placed when the piece generates
+    entity: tensura:goblin           # Tensura places goblins the same way (goblin_spawn.nbt; read from its jar 11-06)
+    per_piece: { goblin_hut: 1, goblin_chief_hall: 3, goblin_lean_to: 1, goblin_watchtower: 1 }
   village:                         # jigsaw world gen (vanilla data, no Java)
     structure: goblin_camp
-    biomes: ["#minecraft:is_forest", "#minecraft:is_taiga"]   # Tensura Jura biomes to add once ids are read from the jar
+    biomes: ["#minecraft:is_forest", "#minecraft:is_taiga"]   # covers tensura:ancient_forest (Tensura adds it to is_forest; no Jura biome exists)
     spacing: 40                     # chunks between attempts; tune
     separation: 16
     salt: 1937204512
     size: 5                         # jigsaw depth: plaza -> streets -> houses
     max_distance_from_center: 64
     terrain_adaptation: beard_thin
+    spawn_overrides:                # copied from Tensura's goblin_village structures (jar read 11-06)
+      creature: { bounding_box: full, spawns: [ { type: "tensura:goblin", weight: 1, minCount: 1, maxCount: 2 } ] }
+      monster:  { bounding_box: full, spawns: [] }
     pools:                          # pool -> { building id: weight }
       center:  { goblin_plaza: 1 }
       chief:   { goblin_chief_hall: 1 }

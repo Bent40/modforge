@@ -29,12 +29,7 @@
    "minecraft:spruce_slab": 20,
    "minecraft:spruce_log": 16,
    "minecraft:hay_block": 37
-  },
-  "previews": [
-   "previews/goblin_hut_front.png",
-   "previews/goblin_hut_back.png",
-   "previews/goblin_hut_cutaway.png"
-  ]
+  }
  },
  {
   "id": "goblin_chief_hall",
@@ -71,12 +66,7 @@
    "minecraft:spruce_planks": 11,
    "minecraft:stripped_spruce_wood": 7,
    "minecraft:brown_wall_banner": 1
-  },
-  "previews": [
-   "previews/goblin_chief_hall_front.png",
-   "previews/goblin_chief_hall_back.png",
-   "previews/goblin_chief_hall_cutaway.png"
-  ]
+  }
  },
  {
   "id": "goblin_watchtower",
@@ -101,12 +91,7 @@
    "minecraft:wall_torch": 2,
    "minecraft:spruce_slab": 24,
    "minecraft:hay_block": 25
-  },
-  "previews": [
-   "previews/goblin_watchtower_front.png",
-   "previews/goblin_watchtower_back.png",
-   "previews/goblin_watchtower_cutaway.png"
-  ]
+  }
  },
  {
   "id": "goblin_lean_to",
@@ -134,12 +119,7 @@
    "minecraft:spruce_slab": 14,
    "minecraft:skeleton_skull": 1,
    "minecraft:hay_block": 28
-  },
-  "previews": [
-   "previews/goblin_lean_to_front.png",
-   "previews/goblin_lean_to_back.png",
-   "previews/goblin_lean_to_cutaway.png"
-  ]
+  }
  },
  {
   "id": "goblin_plaza",
@@ -163,11 +143,7 @@
    "minecraft:spruce_fence": 8,
    "minecraft:stripped_spruce_log": 6,
    "minecraft:skeleton_skull": 4
-  },
-  "previews": [
-   "previews/goblin_plaza_front.png",
-   "previews/goblin_plaza_back.png"
-  ]
+  }
  },
  {
   "id": "goblin_street",
@@ -183,11 +159,7 @@
    "minecraft:jigsaw": 4,
    "minecraft:coarse_dirt": 6,
    "minecraft:packed_mud": 1
-  },
-  "previews": [
-   "previews/goblin_street_front.png",
-   "previews/goblin_street_back.png"
-  ]
+  }
  },
  {
   "id": "goblin_street_bend_left",
@@ -203,11 +175,7 @@
    "minecraft:jigsaw": 3,
    "minecraft:packed_mud": 1,
    "minecraft:coarse_dirt": 1
-  },
-  "previews": [
-   "previews/goblin_street_bend_left_front.png",
-   "previews/goblin_street_bend_left_back.png"
-  ]
+  }
  },
  {
   "id": "goblin_street_bend_right",
@@ -223,10 +191,6 @@
    "minecraft:jigsaw": 3,
    "minecraft:dirt_path": 4,
    "minecraft:coarse_dirt": 1
-  },
-  "previews": [
-   "previews/goblin_street_bend_right_front.png",
-   "previews/goblin_street_bend_right_back.png"
-  ]
+  }
  }
 ]

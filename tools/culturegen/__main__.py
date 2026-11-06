@@ -33,6 +33,10 @@ def main(argv):
         pal = Palette(culture["palette"], seed=zlib.crc32(b["id"].encode()))
         grid, meta = FORMS[b["form"]](b["params"], pal, culture)
         grid.connect_fences()
+        inh = culture.get("inhabitants", {})
+        if b["id"] in inh.get("per_piece", {}):
+            import random
+            grid.add_inhabitants(inh["entity"], inh["per_piece"][b["id"]], random.Random(zlib.crc32(b["id"].encode())))
         p = os.path.join(sdir, b["id"] + ".nbt")
         root = grid.to_nbt(p)
         roots[b["id"]] = root

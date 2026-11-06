@@ -2,7 +2,23 @@
   "type": "minecraft:jigsaw",
   "biomes": "#isekai_wilds:has_structure/goblin_camp",
   "step": "surface_structures",
-  "spawn_overrides": {},
+  "spawn_overrides": {
+    "creature": {
+      "bounding_box": "full",
+      "spawns": [
+        {
+          "type": "tensura:goblin",
+          "weight": 1,
+          "minCount": 1,
+          "maxCount": 2
+        }
+      ]
+    },
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
   "terrain_adaptation": "beard_thin",
   "start_pool": "isekai_wilds:goblin/center",
   "size": 5,

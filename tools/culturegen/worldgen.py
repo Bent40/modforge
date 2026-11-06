@@ -66,7 +66,7 @@ def write_worldgen(out, culture, ns, race):
         "type": "minecraft:jigsaw",
         "biomes": "#" + tag,
         "step": "surface_structures",
-        "spawn_overrides": {},
+        "spawn_overrides": v.get("spawn_overrides", {}),
         "terrain_adaptation": v.get("terrain_adaptation", "beard_thin"),
         "start_pool": f"{ns}:{race}/center",
         "size": v["size"],

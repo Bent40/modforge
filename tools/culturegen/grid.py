@@ -28,6 +28,15 @@ class Grid:
     def __init__(self):
         self.cells = {}
         self.block_entities = {}
+        self.entities = []  # (x, y, z, nbt) in block coords
+
+    def add_inhabitants(self, entity_id, count, rng):
+        """Put `count` mobs on free interior floor cells (air with air above and a full block below)."""
+        spots = sorted(p for p, c in self.cells.items() if c[0] == "minecraft:air"
+                       and self.get(p[0], p[1] + 1, p[2]) and self.get(p[0], p[1] + 1, p[2])[0] == "minecraft:air"
+                       and self.solid(p[0], p[1] - 1, p[2]))
+        for (x, y, z) in rng.sample(spots, min(count, len(spots))):
+            self.entities.append((x, y, z, {"id": entity_id}))
 
     def set(self, x, y, z, block, **props):
         self.cells[(x, y, z)] = (block, {k: str(v).lower() for k, v in props.items()})
@@ -61,6 +70,7 @@ class Grid:
         (mx, my, mz), _ = self.bounds()
         self.cells = {(x - mx, y - my, z - mz): v for (x, y, z), v in self.cells.items()}
         self.block_entities = {(x - mx, y - my, z - mz): v for (x, y, z), v in self.block_entities.items()}
+        self.entities = [(x - mx, y - my, z - mz, e) for (x, y, z, e) in self.entities]
 
     def to_nbt(self, path):
         self.normalise()
@@ -84,7 +94,8 @@ class Grid:
             "size": [Mx + 1, My + 1, Mz + 1],
             "palette": palette,
             "blocks": blocks,
-            "entities": [],
+            "entities": [{"pos": [x + 0.5, float(y), z + 0.5], "blockPos": [x, y, z], "nbt": dict(e)}
+                         for (x, y, z, e) in self.entities],
         }
         nbt.write(path, root)
         return root
