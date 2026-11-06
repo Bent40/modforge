@@ -15,6 +15,7 @@ props. Path: textures/entity/citizen/<style>/<model><male|female><textureId><suf
 to the default style (a human skin), so every name must exist. Tensura goblin textures are 64x64 player layout.
 """
 import os
+import zlib
 import re
 import sys
 
@@ -81,7 +82,7 @@ def main(argv):
         if not pool:
             missing.add((m["gender"], tone))
             continue
-        skin = pool[int(m["id"]) % len(pool)]
+        skin = pool[zlib.crc32(f"{m['model']}{m['id']}".encode()) % len(pool)]  # vary outfits across jobs too
         canvas = Image.new("RGBA", (128, 64), (0, 0, 0, 0))
         canvas.paste(skin, (0, 0))
         canvas.save(os.path.join(out_dir, f))
