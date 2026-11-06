@@ -1,0 +1,10 @@
+{
+  "parts": 2,
+  "order": "EASTERN",
+  "male_firstname": ["Gobu", "Gobzo", "Gobkichi", "Gobuta", "Gobunosuke", "Gobji", "Gobro", "Gobmaru", "Gobsuke", "Gobta-ni",
+                     "Rigo", "Riguzo", "Gaku", "Zagu", "Bogu", "Dobu", "Nogu", "Tobu", "Mogu", "Kobu"],
+  "female_firstname": ["Gobumi", "Gobna", "Gobrin", "Gobyo", "Gobuko", "Gobina", "Riga", "Zagi", "Mogi", "Nogi",
+                       "Hobu", "Kobi", "Tobi", "Dobi", "Bobi", "Gobsa", "Gobmi", "Gobki", "Gobra", "Gobyu"],
+  "surnames": ["of the Warren", "Mudfoot", "Thatchear", "Spruceclaw", "Emberhide", "Bonetotem", "Ashgrin", "Mossknee",
+               "Smokeeye", "Stonetooth"]
+}
