@@ -117,6 +117,20 @@ spec:
       minecraft:lantern: minecraft:lantern
       minecraft:terracotta: minecraft:packed_mud
       minecraft:smooth_stone: minecraft:cobblestone
+      minecraft:iron_bars: minecraft:spruce_fence          # bars -> sticks
+      minecraft:quartz_stairs: minecraft:mud_brick_stairs
+      minecraft:chiseled_stone_bricks: minecraft:mud_bricks
+      minecraft:glowstone: minecraft:shroomlight
+    texture_by_block:                 # Domum Ornamentum blocks: every texture slot forced (roofs become thatch)
+      domum_ornamentum:shingle: minecraft:hay_block
+      domum_ornamentum:shingle_slab: minecraft:hay_block
+    texture_exact:                    # Domum texture values (glass can't become air inside a texture)
+      minecraft:glass: minecraft:spruce_planks
+      domum_ornamentum:brick_extra: minecraft:mud_bricks
+      domum_ornamentum:orange_brick_extra: minecraft:mud_bricks
+      domum_ornamentum:paper_extra: minecraft:packed_mud
+      domum_ornamentum:white_paper_extra: minecraft:packed_mud
+      minecraft:light_blue_stained_glass: minecraft:spruce_planks
     patterns:                         # regex on the id without "minecraft:"
       ".*_stained_glass(_pane)?": minecraft:air
       ".*_glazed_terracotta": minecraft:mud_bricks

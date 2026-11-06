@@ -34,6 +34,11 @@ def _full(prefix):
     return prefix + "s" if prefix.endswith(("brick", "tile")) else prefix
 
 
+# targets that carry no blockstate properties (drop the source's, e.g. glazed terracotta `facing`)
+NO_PROPS = {"minecraft:" + n for n in ("mud_bricks", "packed_mud", "cobblestone", "mossy_cobblestone", "spruce_planks",
+                                        "coarse_dirt", "dirt", "air", "stone_bricks", "shroomlight", "hay_block")}
+
+
 class Rules:
     def __init__(self, spec):
         r = spec["reskin"]
@@ -42,6 +47,18 @@ class Rules:
         self.exact = r.get("exact", {})             # source id -> target id ("" = leave, "minecraft:air" = remove)
         self.dye = r.get("dye", {})                 # wool/carpet/banner/bed colour -> target colour
         self.patterns = [(re.compile(k), v) for k, v in r.get("patterns", {}).items()]
+        self.texture_exact = r.get("texture_exact", {})      # Domum textureData value -> value
+        self.texture_by_block = r.get("texture_by_block", {})  # Domum block id -> forced texture for every slot
+
+    def map_texture(self, block, value):
+        if block in self.texture_by_block:
+            return self.texture_by_block[block]
+        if value in self.texture_exact:
+            return self.texture_exact[value]
+        new = self.map(value)
+        if new == "minecraft:air":  # a texture can't be air: use whatever replaces plain glass
+            return self.texture_exact.get("minecraft:glass", value)
+        return new
 
     def map(self, name):
         if not name.startswith("minecraft:"):
@@ -81,12 +98,25 @@ class Rules:
         return name
 
 
+def _texture_maps(obj):
+    """Every Domum `textureData` map inside a tile entity, wherever it is nested."""
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k == "textureData" and isinstance(v, dict):
+                yield v
+            else:
+                yield from _texture_maps(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from _texture_maps(v)
+
+
 def reskin_pack(spec, src, out, render_n=0):
     rules = Rules(spec)
     if os.path.exists(out):
         shutil.rmtree(out)
     shutil.copytree(src, out, ignore=shutil.ignore_patterns("*.blueprint"))
-    report = {"files": 0, "changed_states": 0, "kept": {}, "mapped": {}}
+    report = {"files": 0, "changed_states": 0, "kept": {}, "mapped": {}, "textures": {}, "textures_kept": {}}
     rendered = []
     for dp, _, files in os.walk(src):
         for f in sorted(files):
@@ -96,6 +126,17 @@ def reskin_pack(spec, src, out, render_n=0):
             o = os.path.join(out, os.path.relpath(s, src))
             os.makedirs(os.path.dirname(o), exist_ok=True)
             root = bp.read(s)
+            names = [e["Name"] for e in root["palette"]]
+            for te in root.get("tile_entities", []):
+                for td in _texture_maps(te):
+                    blk = names[root["_flat"][bp.idx(root, te["x"], te["y"], te["z"])]] if "x" in te else ""
+                    for k, v in list(td.items()):
+                        nv = rules.map_texture(blk, v)
+                        if nv != v:
+                            td[k] = nv
+                            report["textures"][f"{v} -> {nv}"] = report["textures"].get(f"{v} -> {nv}", 0) + 1
+                        else:
+                            report["textures_kept"][v] = report["textures_kept"].get(v, 0) + 1
             for e in root["palette"]:
                 old = e["Name"]
                 new = rules.map(old)
@@ -103,13 +144,13 @@ def reskin_pack(spec, src, out, render_n=0):
                     report["mapped"][f"{old} -> {new}"] = report["mapped"].get(f"{old} -> {new}", 0) + 1
                     report["changed_states"] += 1
                     e["Name"] = new
-                    if new == "minecraft:air":
+                    if new in NO_PROPS:
                         e.pop("Properties", None)
                 elif not old.startswith(("minecolonies:", "structurize:")) and old != "minecraft:air":
                     report["kept"][old] = report["kept"].get(old, 0) + 1
             bp.write(o, root)
             report["files"] += 1
-            if render_n and len(rendered) < render_n and re.search(r"(townhall|residence|builder)1\.blueprint$", f):
+            if render_n and len(rendered) < render_n and re.fullmatch(r"(townhall|residence|builder)1\.blueprint", f):
                 from .render import render
                 rp = os.path.join(out, "_preview_" + f.replace(".blueprint", ".png"))
                 render(bp.to_grid(root), rp, scale=2)
@@ -122,7 +163,8 @@ def reskin_pack(spec, src, out, render_n=0):
     r = spec["reskin"]
     meta.update({"name": r["pack_name"], "desc": r.get("pack_desc", ""), "authors": r.get("authors", ["culturegen"])})
     json.dump(meta, open(pj, "w"), indent=2)
-    report["kept"] = dict(sorted(report["kept"].items(), key=lambda kv: -kv[1]))
+    for k in ("kept", "textures", "textures_kept"):
+        report[k] = dict(sorted(report[k].items(), key=lambda kv: -kv[1]))
     json.dump(report, open(os.path.join(out, "_reskin_report.json"), "w"), indent=1)
     return report, rendered
 
@@ -132,7 +174,10 @@ def main(argv):
     n = int(argv[argv.index("--render") + 1]) if "--render" in argv else 0
     report, rendered = reskin_pack(doc["spec"], argv[1], argv[2], n)
     print(report["files"], "blueprints;", report["changed_states"], "palette entries remapped;",
-          len(report["kept"]), "block ids kept as they were")
+          len(report["kept"]), "block ids kept as they were;", sum(report["textures"].values()),
+          "Domum texture slots remapped,", sum(report["textures_kept"].values()), "kept")
+    for k, v in list(report["textures_kept"].items())[:15]:
+        print("  texture kept", v, k)
     for k, v in list(report["kept"].items())[:25]:
         print("  kept", v, k)
     for p in rendered:
