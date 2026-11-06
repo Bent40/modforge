@@ -96,6 +96,7 @@ spec:
     spacing: 40                     # chunks between attempts; tune
     separation: 16
     salt: 1937204512
+    exclusion_zone: { other_set: "minecraft:villages", chunk_count: 6 }   # in-game test 11-06: a camp overlapped a village
     size: 5                         # jigsaw depth: plaza -> streets -> houses
     max_distance_from_center: 64
     terrain_adaptation: beard_thin

@@ -41,3 +41,12 @@ generator follows terrain and priorities, so real camps will differ in detail.
 3. `/place structure isekai_wilds:goblin_camp ~ ~ ~` a few times on varied ground: paths follow terrain,
    buildings sit flat, nothing floats or is buried.
 4. New chunks: `/locate structure isekai_wilds:goblin_camp` in a forest; fly there.
+
+## In-game result (2026-11-06, TestServer on NeoForge 21.1.264, fresh world goblin_test)
+- All 8 pieces load with `/place template`. `/place structure` worked in forest, birch forest and taiga. `/locate` found a camp that generated naturally.
+- No jigsaw blocks are left in the camps. Goblins are present: roughly 14–24 per camp area, steady for about 6 minutes.
+- No log errors from the datapack.
+- Trees grew through some huts, but only in camps forced with `/place structure`.
+- A camp on a steep slope looked sparse.
+- The natural camp overlapped other mods' structures, so an `exclusion_zone` against minecraft:villages was added.
+- Tensura facts read from its jar: there are 6 wood variants of `tensura:villages/goblin_village/*`, all in one set (spacing 34, separation 16). Goblins come from a spawn pool piece plus `spawn_overrides`. There is no Jura biome; `tensura:ancient_forest` is in `#minecraft:is_forest`.

@@ -78,6 +78,7 @@ def write_worldgen(out, culture, ns, race):
     files.append(_dump(os.path.join(d, "worldgen", "structure_set", sid + ".json"), {
         "structures": [{"structure": f"{ns}:{sid}", "weight": 1}],
         "placement": {"type": "minecraft:random_spread", "spacing": v["spacing"],
-                      "separation": v["separation"], "salt": v["salt"]},
+                      "separation": v["separation"], "salt": v["salt"],
+                      **({"exclusion_zone": v["exclusion_zone"]} if "exclusion_zone" in v else {})},
     }))
     return files
