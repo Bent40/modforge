@@ -56,7 +56,7 @@ def _hex(h):
 
 def _texture(name, face):
     """face: 'top' | 'side'. Returns N x N x 3 (row = v downward... we index [u][v])."""
-    style, a, b, c = LOOK.get(name, ("flat", "#ff00ff", "#ff00ff", "#ff00ff"))
+    style, a, b, c = LOOK.get(name, ("noise", "#8a8a8a", "#777777", "#9a9a9a"))
     A, B, C = _hex(a), _hex(b), _hex(c)
     rng = random.Random(zlib.crc32(f"{name}/{face}".encode()))
     t = np.zeros((N, N, 3))

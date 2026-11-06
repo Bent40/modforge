@@ -13,9 +13,45 @@ class Byte(int):
     pass
 
 
+class Short(int):
+    pass
+
+
+class IntArray(list):
+    pass
+
+
+class ByteArray(list):
+    pass
+
+
+class LongArray(list):
+    pass
+
+
+class Float(float):
+    pass
+
+
+class Long(int):
+    pass
+
+
 def _tag_of(v):
     if isinstance(v, Byte) or isinstance(v, bool):
         return BYTE
+    if isinstance(v, Long):
+        return LONG
+    if isinstance(v, Float):
+        return FLOAT
+    if isinstance(v, Short):
+        return SHORT
+    if isinstance(v, IntArray):
+        return INT_ARRAY
+    if isinstance(v, ByteArray):
+        return BYTE_ARRAY
+    if isinstance(v, LongArray):
+        return LONG_ARRAY
     if isinstance(v, int):
         return INT
     if isinstance(v, float):
@@ -39,6 +75,18 @@ def _payload(tag, v):
         return struct.pack(">b", int(v))
     if tag == INT:
         return struct.pack(">i", v)
+    if tag == SHORT:
+        return struct.pack(">h", v)
+    if tag == LONG:
+        return struct.pack(">q", v)
+    if tag == FLOAT:
+        return struct.pack(">f", v)
+    if tag == INT_ARRAY:
+        return struct.pack(">i", len(v)) + struct.pack(f">{len(v)}i", *v)
+    if tag == BYTE_ARRAY:
+        return struct.pack(">i", len(v)) + struct.pack(f">{len(v)}b", *v)
+    if tag == LONG_ARRAY:
+        return struct.pack(">i", len(v)) + struct.pack(f">{len(v)}q", *v)
     if tag == DOUBLE:
         return struct.pack(">d", v)
     if tag == STRING:
@@ -58,6 +106,7 @@ def _payload(tag, v):
 
 
 def write(path, root, name=""):
+    """Write a gzipped NBT file. Use the Byte/Short/Long/Float/*Array wrappers to keep exact tag types."""
     data = struct.pack(">b", COMPOUND) + _str(name) + _payload(COMPOUND, root)
     with gzip.open(path, "wb") as f:
         f.write(data)
@@ -79,19 +128,28 @@ def read(path):
 
     def payload(t):
         if t == BYTE:
-            return struct.unpack(">b", take(1))[0]
+            return Byte(struct.unpack(">b", take(1))[0])
         if t == SHORT:
-            return struct.unpack(">h", take(2))[0]
+            return Short(struct.unpack(">h", take(2))[0])
         if t == INT:
             return struct.unpack(">i", take(4))[0]
         if t == LONG:
-            return struct.unpack(">q", take(8))[0]
+            return Long(struct.unpack(">q", take(8))[0])
         if t == FLOAT:
-            return struct.unpack(">f", take(4))[0]
+            return Float(struct.unpack(">f", take(4))[0])
         if t == DOUBLE:
             return struct.unpack(">d", take(8))[0]
         if t == STRING:
             return rstr()
+        if t == BYTE_ARRAY:
+            (n,) = struct.unpack(">i", take(4))
+            return ByteArray(struct.unpack(f">{n}b", take(n)))
+        if t == INT_ARRAY:
+            (n,) = struct.unpack(">i", take(4))
+            return IntArray(struct.unpack(f">{n}i", take(4 * n)))
+        if t == LONG_ARRAY:
+            (n,) = struct.unpack(">i", take(4))
+            return LongArray(struct.unpack(f">{n}q", take(8 * n)))
         if t == LIST:
             et, n = struct.unpack(">bi", take(5))
             return [payload(et) for _ in range(n)]
