@@ -172,6 +172,46 @@ spec:
           - { form: lean_to, params: { width: 9,  depth: 5 }, racks: 4, furnaces: 2 }
           - { form: lean_to, params: { width: 11, depth: 5 }, racks: 6, furnaces: 2 }
           - { form: lean_to, params: { width: 13, depth: 6 }, racks: 8, furnaces: 2 }
+    auto_huts:                       # working blocks copied per level from the source pack (reskin.source_pack)
+      - { id: blacksmith, source: craftsmanship/metallurgy/blacksmith, shell: round_hut }
+      - { id: mechanic, source: craftsmanship/metallurgy/mechanic, shell: round_hut }
+      - { id: smeltery, source: craftsmanship/metallurgy/smeltery, shell: round_hut }
+      - { id: sawmill, source: craftsmanship/carpentry/sawmill, shell: round_hut }
+      - { id: fletcher, source: craftsmanship/carpentry/fletcher, shell: round_hut }
+      - { id: alchemist, source: craftsmanship/luxury/alchemist, shell: round_hut }
+      - { id: baker, source: craftsmanship/luxury/baker, shell: round_hut }
+      - { id: concretemixer, source: craftsmanship/luxury/concretemixer, shell: round_hut }
+      - { id: dyer, source: craftsmanship/luxury/dyer, shell: round_hut }
+      - { id: glassblower, source: craftsmanship/luxury/glassblower, shell: round_hut }
+      - { id: kitchen, source: craftsmanship/luxury/kitchen, shell: round_hut }
+      - { id: crusher, source: craftsmanship/masonry/crusher, shell: round_hut }
+      - { id: sifter, source: craftsmanship/masonry/sifter, shell: round_hut }
+      - { id: stonemason, source: craftsmanship/masonry/stonemason, shell: round_hut }
+      - { id: stonesmeltery, source: craftsmanship/masonry/stonesmeltery, shell: round_hut }
+      - { id: deliveryman, source: craftsmanship/storage/deliveryman, shell: round_hut }
+      - { id: warehouse, source: craftsmanship/storage/warehouse, shell: long_hall }
+      - { id: library, source: education/library, shell: long_hall }
+      - { id: school, source: education/school, shell: long_hall }
+      - { id: university, source: education/university, shell: long_hall }
+      - { id: cook, source: fundamentals/cook, shell: round_hut }
+      - { id: hospital, source: fundamentals/hospital, shell: long_hall }
+      - { id: lumberjack, source: fundamentals/lumberjack, shell: round_hut }
+      - { id: tavern, source: fundamentals/tavern, shell: long_hall }
+      - { id: chickenherder, source: agriculture/husbandry/chickenherder, shell: round_hut }
+      - { id: cowboy, source: agriculture/husbandry/cowboy, shell: round_hut }
+      - { id: rabbithutch, source: agriculture/husbandry/rabbithutch, shell: round_hut }
+      - { id: shepherd, source: agriculture/husbandry/shepherd, shell: round_hut }
+      - { id: swineherder, source: agriculture/husbandry/swineherder, shell: round_hut }
+      - { id: beekeeper, source: agriculture/husbandry/beekeeper, shell: round_hut }
+      - { id: composter, source: agriculture/horticulture/composter, shell: round_hut }
+      - { id: farmer, source: agriculture/horticulture/farmer, shell: round_hut }
+      - { id: florist, source: agriculture/horticulture/florist, shell: round_hut }
+      - { id: archery, source: military/archery, shell: long_hall }
+      - { id: combatacademy, source: military/combatacademy, shell: long_hall }
+      - { id: guardtower, source: military/guardtower, shell: round_hut }
+      - { id: enchanter, source: mystic/enchanter, shell: round_hut }
+      - { id: graveyard, source: mystic/graveyard, shell: round_hut }
+      - { id: mysticalsite, source: mystic/mysticalsite, shell: round_hut }
   village:                         # jigsaw world gen (vanilla data, no Java)
     structure: goblin_camp
     biomes: ["#minecraft:is_forest", "#minecraft:is_taiga"]   # covers tensura:ancient_forest (Tensura adds it to is_forest; no Jura biome exists)

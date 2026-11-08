@@ -122,14 +122,28 @@ def furnish(g, needs, keep_clear, seed):
     Beds take two cells, head against the wall. Returns what could not be placed."""
     free = set(_free_floor(g, keep_clear))
     order = sorted(free, key=lambda p: (0 if _wall_dir(g, *p) else 1, zlib.crc32(f"{seed}{p}".encode())))
+    budget = int(len(free) * 0.5)            # leave half the floor to walk on
+    stack = []                               # rack tops: (x, z) where a second rack can sit at y=2
     missed = []
     for kind, block, props in needs:
         placed = False
+        is_rack = block == "minecolonies:blockminecoloniesrack"
+        if is_rack and stack:
+            x, z = stack.pop()
+            p = dict(props)
+            te_tpl = p.pop("_te", None)
+            g.set(x, 2, z, block, **p)
+            g.block_entities[(x, 2, z)] = dict(te_tpl) if te_tpl else _te("rack")
+            continue
+        if budget <= 0:
+            missed.append(kind)
+            continue
         for (x, z) in order:
             if (x, z) not in free:
                 continue
             wd = _wall_dir(g, x, z)
             if kind == "bed":
+                block = props.get("_block", block)
                 if not wd:
                     continue
                 fx, fz = x - DIRS[wd][0], z - DIRS[wd][1]  # foot one step away from the wall
@@ -143,17 +157,23 @@ def furnish(g, needs, keep_clear, seed):
                 g.block_entities[(fx, 1, fz)] = _te("bed")
                 free -= {(x, z), (fx, fz)}
                 free.discard((bx, bz))  # walkway
+                budget -= 2
                 placed = True
                 break
             face = OPP[wd] if wd else "north"
             p = dict(props)
+            te_tpl = p.pop("_te", None)
             if "facing" in p:
                 p["facing"] = face
             g.set(x, 1, z, block, **p)
-            te = _te(kind)
+            te = dict(te_tpl) if te_tpl else _te("rack" if is_rack else kind)
             if te:
                 g.block_entities[(x, 1, z)] = te
             free.discard((x, z))
+            budget -= 1
+            if is_rack and wd and g.get(x, 2, z) and g.get(x, 2, z)[0] == "minecraft:air" and g.solid(
+                    x + DIRS[wd][0], 2, z + DIRS[wd][1]):
+                stack.append((x, z))
             placed = True
             break
         if not placed:
@@ -211,6 +231,122 @@ def build_hut(hut, culture):
     return out
 
 
+# ---------- auto huts: working blocks copied from a source pack's hut, shell sized to fit ----------
+SKIP_TE = {"minecolonies:colonybuilding", "minecraft:sign", "minecraft:hanging_sign", "minecraft:banner",
+           "domum_ornamentum:materially_retexturable", "minecolonies:colony_flag", "minecraft:jukebox",
+           "minecraft:dispenser", "minecraft:dropper", "minecraft:hopper", "minecraft:bell", "minecraft:beacon",
+           "minecraft:ender_chest", "minecraft:skull", "minecraft:campfire"}
+SKIP_MC = ("minecolonies:blockhut", "minecolonies:colony_wall_banner", "minecolonies:colony_banner",
+           "minecolonies:blockconstructiontape", "minecolonies:decorationcontroller", "minecolonies:blockwaypoint",
+           "minecolonies:gate_")
+FACING_ONLY = {"facing"}
+SIGNATURE = {"minecraft:anvil": 2, "minecraft:chipped_anvil": 1, "minecraft:grindstone": 2, "minecraft:stonecutter": 2,
+             "minecraft:smithing_table": 2, "minecraft:loom": 2, "minecraft:cartography_table": 1,
+             "minecraft:fletching_table": 2, "minecraft:cauldron": 2, "minecraft:water_cauldron": 2,
+             "minecraft:composter": 2, "minecraft:bookshelf": 8, "minecraft:crafting_table": 2}
+
+
+def source_needs(path):
+    """(hut_block, needs) from a source blueprint: every working block, with its tile entity as a template."""
+    root = bp.read(path)
+    sx, sy, sz = root["size_x"], root["size_y"], root["size_z"]
+    pal = root["palette"]
+    tes = {(t["x"], t["y"], t["z"]): t for t in root["tile_entities"]}
+    hut_block, needs = None, []
+    sig = {}
+    for i, pi in enumerate(bp.unpack_blocks(root["blocks"], sx * sy * sz)):
+        e = pal[pi]
+        n, props = e["Name"], dict(e.get("Properties", {}))
+        if n.startswith("minecolonies:blockhut"):
+            hut_block = n
+            continue
+        x, z, y = i % sx, (i // sx) % sz, i // (sx * sz)
+        te = tes.get((x, y, z))
+        if n.endswith("_bed"):
+            if props.get("part") == "head":
+                needs.append(("bed", n, {"_block": n}))
+            continue
+        if n.endswith("_door") or n.endswith("_chest") and props.get("type") == "left":
+            continue
+        if n in SIGNATURE and te is None:
+            if sig.get(n, 0) < SIGNATURE[n]:
+                sig[n] = sig.get(n, 0) + 1
+                needs.append(("block", n, {k: str(v) for k, v in props.items()}))
+            continue
+        is_mc = n.startswith("minecolonies:") and not n.startswith(SKIP_MC)
+        has_te = te is not None and te["id"] not in SKIP_TE
+        if not (is_mc or has_te):
+            continue
+        keep = {k: str(v) for k, v in props.items() if k not in ("part",)}
+        if n.endswith("chest"):
+            keep["type"] = "single"
+        if has_te:
+            t = {k: v for k, v in te.items() if k not in ("x", "y", "z", "pos")}
+            keep["_te"] = t
+        needs.append(("block", n, keep))
+    # bulky first so they get wall spots
+    order = {"bed": 0}
+    needs.sort(key=lambda t: (order.get(t[0], 1), t[1]))
+    return hut_block, needs
+
+
+SHELL_SIZES = {
+    "round_hut": [{"diameter": d, "wall_height": 3 if d < 13 else 4} for d in (7, 9, 11, 13, 15, 17, 19)],
+    "long_hall": [{"width": w, "length": L, "wall_height": 4, "post_spacing": 4}
+                  for w in (9, 11) for L in range(11, 48, 4)],
+}
+
+
+def build_auto_hut(hut, culture, pack_dir):
+    """Levels from the source pack's <path>1..5; each level gets the smallest shell (never smaller than the
+    previous level's) that holds every working block."""
+    import glob
+    levels = []
+    floor = 0
+    srcs = sorted(glob.glob(os.path.join(pack_dir, hut["source"] + "[0-9].blueprint")))
+    hut_block = None
+    for src in srcs:
+        lv = int(os.path.basename(src)[len(os.path.basename(hut["source"])):].split(".")[0])
+        hb, needs = source_needs(src)
+        hut_block = hut_block or hb
+        sizes = SHELL_SIZES[hut["shell"]]
+        done = None
+        for si in range(floor, len(sizes)):
+            pal = Palette(culture["palette"], seed=zlib.crc32(f"{hut['id']}{lv}".encode()))
+            g, _ = FORMS[hut["shell"]](sizes[si], pal, culture)
+            _strip(g)
+            anchor = _anchor(g, hut["shell"], sizes[si])
+            g = _shift(g, -anchor[0], -anchor[1])
+            hx, hz = 1, 0
+            keep = {(hx, hz), (hx, hz - 1), (hx, hz + 1), (hx - 1, hz), (hx + 1, hz)} | _door_lane(g)
+            missed = furnish(g, needs, keep, f"{hut['id']}{lv}")
+            if not missed or si == len(sizes) - 1:
+                done = (lv, g, missed, si)
+                break
+        lv, g, missed, floor = done
+        g.connect_fences()
+        _fill_tes(g)
+        levels.append((lv, g, missed))
+    return _share_footprint(levels, (1, 0)), hut_block
+
+
+def _share_footprint(levels, hut_at):
+    xs, ys, zs = [], [], []
+    for _, g, _ in levels:
+        (a, b, c), (d, e, f) = g.bounds()
+        xs += [a, d]; ys += [b, e]; zs += [c, f]
+    lo, hi = (min(xs), min(ys), min(zs)), (max(xs), max(ys), max(zs))
+    out = []
+    for lv, g, missed in levels:
+        for corner in (lo, hi):
+            if corner not in g.cells:
+                g.set(*corner, SUB)
+        g.normalise()
+        hx, hz = hut_at
+        out.append((lv, g, (hx - lo[0], 1 - lo[1], hz - lo[2]), missed))
+    return out
+
+
 def _anchor(g, form, p):
     """The point all levels line up on: the hearth / centre of the main building, in grid coords."""
     if form == "round_hut":
@@ -245,9 +381,22 @@ def main(argv):
     os.makedirs(bdir, exist_ok=True)
     os.makedirs(pdir, exist_ok=True)
     report = []
-    for hut in culture["colony"]["huts"]:
-        for lv, g, hut_pos, missed in build_hut(hut, culture):
+    src_pack = argv[argv.index("--source-pack") + 1] if "--source-pack" in argv else None
+    only = set(argv[argv.index("--only") + 1].split(",")) if "--only" in argv else None
+    jobs = [(hut, build_hut(hut, culture)) for hut in culture["colony"].get("huts", [])
+            if not only or hut["id"] in only]
+    if src_pack:
+        for hut in culture["colony"].get("auto_huts", []):
+            if only and hut["id"] not in only:
+                continue
+            lvls, hb = build_auto_hut(hut, culture, src_pack)
+            jobs.append((dict(hut, hut_block=hb), lvls))
+    for hut, built in jobs:
+        sub = os.path.dirname(hut.get("source", ""))
+        os.makedirs(os.path.join(bdir, sub), exist_ok=True)
+        for lv, g, hut_pos, missed in built:
             name = f"{hut['id']}{lv}.blueprint"
+            rel = os.path.join(sub, name)
             g.set(*hut_pos, hut["hut_block"], facing="north")  # so previews show where the hut block sits
             if render_on:
                 from .render import render
@@ -255,15 +404,15 @@ def main(argv):
                 render(g, os.path.join(pdir, f"{hut['id']}{lv}_cutaway.png"), scale=4, cut_y=hut.get("cut_y", 3))
             root = bp.from_grid(g, name, hut["hut_block"], hut_pos, hut_facing="north",
                                 architects=["culturegen"])
-            bp.write(os.path.join(bdir, name), root)
-            back = bp.read(os.path.join(bdir, name))
+            bp.write(os.path.join(bdir, rel), root)
+            back = bp.read(os.path.join(bdir, rel))
             counts = {}
             names = [p["Name"] for p in back["palette"]]
             for i in bp.unpack_blocks(back["blocks"], back["size_x"] * back["size_y"] * back["size_z"]):
                 counts[names[i]] = counts.get(names[i], 0) + 1
             beds = sum(v for k, v in counts.items() if k.endswith("_bed")) // 2
             racks = counts.get("minecolonies:blockminecoloniesrack", 0)
-            line = (f"{name}: size {back['size_x']}x{back['size_y']}x{back['size_z']} hut@{hut_pos} beds {beds} "
+            line = (f"{rel}: size {back['size_x']}x{back['size_y']}x{back['size_z']} hut@{hut_pos} beds {beds} "
                     f"racks {racks} stash {counts.get('minecolonies:blockstash', 0)} "
                     f"chests {counts.get('minecraft:chest', 0)} furnaces {counts.get('minecraft:furnace', 0)}"
                     + (f"  MISSED {missed}" if missed else ""))
