@@ -136,6 +136,42 @@ spec:
       ".*_glazed_terracotta": minecraft:mud_bricks
       ".*_terracotta": minecraft:packed_mud
       ".*_concrete": minecraft:packed_mud
+  colony:                          # MineColonies huts (tools/culturegen/colony.py); same footprint every level
+    huts:
+      - id: residence
+        hut_block: minecolonies:blockhutcitizen
+        hut_block_at: [1, 0]          # east of the hearth, relative to the hut centre; same in every level
+        cut_y: 3
+        levels:                        # residence level n = n beds (n citizens)
+          - { form: round_hut, params: { diameter: 7,  wall_height: 3 }, beds: 1, racks: 1 }
+          - { form: round_hut, params: { diameter: 9,  wall_height: 3 }, beds: 2, racks: 1, workbenches: 1 }
+          - { form: round_hut, params: { diameter: 11, wall_height: 3 }, beds: 3, racks: 2, workbenches: 1 }
+          - { form: round_hut, params: { diameter: 13, wall_height: 4 }, beds: 4, racks: 3, workbenches: 1 }
+          - { form: round_hut, params: { diameter: 13, wall_height: 4 }, beds: 5, racks: 4, workbenches: 1, chests: 1,
+              annex: [ { form: lean_to, params: { width: 5, depth: 4 }, at: [8, -1] } ] }   # smoking shed beside the hut
+      - id: townhall
+        hut_block: minecolonies:blockhuttownhall
+        hut_block_at: [1, 0]
+        cut_y: 3
+        levels:
+          - { form: long_hall, params: { width: 9, length: 11, wall_height: 4, post_spacing: 4 }, beds: 1, racks: 1, chests: 2, furnaces: 1 }
+          - { form: long_hall, params: { width: 9, length: 15, wall_height: 4, post_spacing: 4 }, beds: 1, racks: 2, chests: 2, furnaces: 1 }
+          - { form: long_hall, params: { width: 9, length: 19, wall_height: 4, post_spacing: 4 }, beds: 3, racks: 4, chests: 4, furnaces: 2, stash: 1 }
+          - { form: long_hall, params: { width: 9, length: 23, wall_height: 4, post_spacing: 4 }, beds: 6, racks: 6, chests: 6, furnaces: 2, stash: 1,
+              annex: [ { form: stilt_tower, params: { width: 5, deck_height: 6, rail_height: 1, roof_height: 3 }, at: [6, 5] } ] }
+          - { form: long_hall, params: { width: 9, length: 27, wall_height: 4, post_spacing: 4 }, beds: 11, racks: 8, chests: 8, furnaces: 3, stash: 1,
+              annex: [ { form: stilt_tower, params: { width: 5, deck_height: 6, rail_height: 1, roof_height: 3 }, at: [6, 7] },
+                       { form: stilt_tower, params: { width: 5, deck_height: 6, rail_height: 1, roof_height: 3 }, at: [-10, 7] } ] }
+      - id: builder
+        hut_block: minecolonies:blockhutbuilder
+        hut_block_at: [0, -2]         # middle of the shed floor
+        cut_y: 3
+        levels:
+          - { form: lean_to, params: { width: 5,  depth: 4 } }
+          - { form: lean_to, params: { width: 7,  depth: 4 }, racks: 2, furnaces: 1 }
+          - { form: lean_to, params: { width: 9,  depth: 5 }, racks: 4, furnaces: 2 }
+          - { form: lean_to, params: { width: 11, depth: 5 }, racks: 6, furnaces: 2 }
+          - { form: lean_to, params: { width: 13, depth: 6 }, racks: 8, furnaces: 2 }
   village:                         # jigsaw world gen (vanilla data, no Java)
     structure: goblin_camp
     biomes: ["#minecraft:is_forest", "#minecraft:is_taiga"]   # covers tensura:ancient_forest (Tensura adds it to is_forest; no Jura biome exists)

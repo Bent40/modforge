@@ -45,6 +45,14 @@ LOOK = {
     "minecraft:crafting_table": ("planks", "#8a6a3e", "#5b4226", "#a07c4a"),
     "minecraft:smoker": ("cobble", "#5a5450", "#3e3a36", "#7a6e66"),
     "minecraft:dirt_path": ("noise", "#94753f", "#7e6234", "#a8884e"),
+    "minecraft:brown_bed": ("noise", "#6e3f22", "#5a3219", "#d8d2c0"),
+    "minecraft:chest": ("planks", "#9a6e2e", "#6e4c1e", "#b4843c"),
+    "minecraft:furnace": ("cobble", "#6e6e6e", "#4a4a4a", "#8a8a8a"),
+    "minecolonies:blockminecoloniesrack": ("planks", "#5e4429", "#3a2a18", "#8a6a40"),
+    "minecolonies:blockstash": ("planks", "#a07a3a", "#6e5226", "#c49a4e"),
+    "minecolonies:blockhutcitizen": ("flat", "#d4a017", "#b8860b", "#f0c040"),
+    "minecolonies:blockhuttownhall": ("flat", "#d4a017", "#b8860b", "#f0c040"),
+    "minecolonies:blockhutbuilder": ("flat", "#d4a017", "#b8860b", "#f0c040"),
     GRASS: ("grass", "#6a9a3c", "#5a8632", "#86603f"),
     FLAME: ("flat", "#ffcf4a", "#ffcf4a", "#ffcf4a"),
 }
@@ -144,6 +152,10 @@ def _shape(name, props):
     if name.endswith("wall_torch"):
         (x0, _, z0), (x1, _, z1) = plate(opp, 2, inset=3)
         return [(((x0, 2, z0), (x1, 6, z1)), name), (((x0, 6, z0), (x1, 7, z1)), FLAME)]
+    if name.endswith("_bed"):
+        return [(((0, 0, 0), (N, 5, N)), name)]
+    if name.startswith("structurize:"):
+        return []
     if name.endswith("_carpet"):
         return [(((0, 0, 0), (N, 1, N)), name)]
     if name == "minecraft:campfire":

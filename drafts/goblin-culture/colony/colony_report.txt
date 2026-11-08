@@ -1,0 +1,15 @@
+residence1.blueprint: size 22x13x15 hut@(8, 1, 7) beds 1 racks 1 stash 0 chests 0 furnaces 0
+residence2.blueprint: size 22x13x15 hut@(8, 1, 7) beds 2 racks 1 stash 0 chests 0 furnaces 0
+residence3.blueprint: size 22x13x15 hut@(8, 1, 7) beds 3 racks 2 stash 0 chests 0 furnaces 0
+residence4.blueprint: size 22x13x15 hut@(8, 1, 7) beds 4 racks 3 stash 0 chests 0 furnaces 0
+residence5.blueprint: size 22x13x15 hut@(8, 1, 7) beds 5 racks 4 stash 0 chests 1 furnaces 0
+townhall1.blueprint: size 23x13x29 hut@(12, 1, 14) beds 1 racks 1 stash 0 chests 2 furnaces 1
+townhall2.blueprint: size 23x13x29 hut@(12, 1, 14) beds 1 racks 2 stash 0 chests 2 furnaces 1
+townhall3.blueprint: size 23x13x29 hut@(12, 1, 14) beds 3 racks 4 stash 1 chests 4 furnaces 2
+townhall4.blueprint: size 23x13x29 hut@(12, 1, 14) beds 6 racks 6 stash 1 chests 6 furnaces 2
+townhall5.blueprint: size 23x13x29 hut@(12, 1, 14) beds 11 racks 8 stash 1 chests 8 furnaces 3
+builder1.blueprint: size 16x5x8 hut@(7, 1, 4) beds 0 racks 0 stash 0 chests 0 furnaces 0
+builder2.blueprint: size 16x5x8 hut@(7, 1, 4) beds 0 racks 2 stash 0 chests 0 furnaces 1
+builder3.blueprint: size 16x5x8 hut@(7, 1, 4) beds 0 racks 4 stash 0 chests 0 furnaces 2
+builder4.blueprint: size 16x5x8 hut@(7, 1, 4) beds 0 racks 6 stash 0 chests 0 furnaces 2
+builder5.blueprint: size 16x5x8 hut@(7, 1, 4) beds 0 racks 8 stash 0 chests 0 furnaces 2
