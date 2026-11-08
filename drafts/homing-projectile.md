@@ -78,3 +78,29 @@ verify:
   - hits a target 45 deg off-line for 6.0; from above for 7.5
   - no block damage, no fire
 ```
+
+## Adapting the pack's existing homing (Ben 2026-11-08: "make sure it is something we can adapt those into")
+
+Verified with javap on the real jars (isekai-chronicles `docs/research/foreign-homing-javap.md`, commit 2df5e10).
+Other mods' homing spells keep their **own steering** (their feel, their numbers). The carrier's shared rules
+join them through a small **adapter** per projectile class, so the rules below apply to every homing thing in the
+pack, ours or not:
+
+```
+adapter:                                   # magicule_standard homing/adapters/, one entry per foreign class
+  get_target: <how to read the lock>       # public getter, or a mixin accessor
+  set_target: <how to move the lock>       # needed for decoys stealing it
+  joins:      [ decoys, lock_warning ]     # turn cap / loss angle / fizzle stay native unless the class lets us override steering
+  impact:     neoforge | manascore         # which impact event barriers/flares must listen to
+```
+
+| mod | class (spells/skills) | lock read/write | adapter kind |
+|---|---|---|---|
+| Iron's Spells | `AbstractMagicProjectile` (Echoing Strikes, Flaming Barrage, …) | public `getHomingTarget` / `setHomingTarget(LivingEntity)` | plain adapter, no mixin |
+| Tensura | `TensuraFlyingProjectile` + children (aura_bullet, magma_shot), `ThrownItemProjectile` (Thrower), `TempestScaleEntity`, `ChaosEaterProjectile` | public get/set `homingTarget` | plain adapter; impact = **manascore** `PROJECTILE_HIT`, NOT NeoForge's event |
+| Ars Nouveau / Ars Elemental | `EntityHomingProjectileSpell` (homing_projectile glyph), `EntityCarianPhalanx` | private field, no accessor | mixin accessor |
+| trnightmare | Asriel orb, Friendliness Pellet, Spellcraft projectile | re-aims at owner's look / builder only | mixin; lowest priority |
+
+Rule: an adapted projectile's lock on a player shows the same lock-warning toast, and illusions/flares can steal it
+(one 25% roll per decoy, same cone). Its damage, cost and mastery stay with its host mod (Iron's/Ars costs already
+flow through magicule via the bridges).
