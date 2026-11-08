@@ -31,3 +31,17 @@ change between levels; hut block facing + primary_offset rules.
 Plan if approved: culturegen forms -> `round_hut` residence (grows a ring per level), `long_hall` town hall
 (grows in length, adds stilts/tower at 4-5), `lean_to` builder yard (racks under the roof, fenced yard). Totem,
 skull banner, hay thatch, mud walls, no glass, as in cultures/goblin.yaml. Previews to Ben first.
+
+## Rollout to every building (Ben approved the theme 2026-11-08)
+
+Pack inventory (scripted, 313 hut blueprints, ~50 hut types):
+- **A. Generic workshops (~35 types)**: crafters, luxury, metallurgy, masonry, husbandry pens, education, mystic,
+  storage, hospital, tavern, barracks. Per level, copy the SOURCE level's working blocks (every block with a
+  tile entity + every `minecolonies:` block: racks, beds, furnaces, smokers, brewing stands, lecterns, beehives,
+  composter barrels, scarecrows, enchanting tables, graves, stash) into a goblin shell sized to fit.
+- **B. Position tags** to recreate: sit (residence/townhall/tavern/cook/library/university), work (blacksmith, cook,
+  university), groundlevel, fishing (fisherman), cobble+ladder (miner), portal+vault (netherworker),
+  bamboo/cactus/sugar (plantation), gatehouse archer/knight/gate/stand_in/out.
+- **C. Keep the reskin**: decorations, infrastructure (roads, rails, mineshafts, adapters), walls, crop fields
+  (blockhutfield / plantationfield): terrain-shaped or not huts.
+Order: A first (biggest win), then B one by one, previews per category for Ben.
