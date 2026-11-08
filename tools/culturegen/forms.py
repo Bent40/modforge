@@ -370,5 +370,26 @@ def street(p, pal, culture):
     return g, {"cut_y": None}
 
 
-FORMS = {"round_hut": round_hut, "long_hall": long_hall, "stilt_tower": stilt_tower, "lean_to": lean_to,
+def pen(p, pal, culture):
+    """Fenced yard: trampled floor, spruce fence ring with a gate at the front, a bone totem on one corner post."""
+    Wd, D = p["width"], p["depth"]
+    m, b = Wd - 1, D - 1
+    g = Grid()
+    for x in range(Wd):
+        for z in range(D):
+            _role(g, pal, x, 0, z, "floor" if p.get("floor") != "path" else "path")
+            if x in (0, m) or z in (0, b):
+                if z == 0 and x == Wd // 2:
+                    g.set(x, 1, z, "minecraft:spruce_fence_gate", facing="north", open="false", in_wall="false",
+                          powered="false")
+                else:
+                    g.set(x, 1, z, pal.main("trim"))
+            else:
+                g.air(x, 1, z)
+                g.air(x, 2, z)
+    g.set(0, 2, 0, pal.main("trophy"), rotation=8, powered="false")
+    return g, {"cut_y": 3}
+
+
+FORMS = {"pen": pen, "round_hut": round_hut, "long_hall": long_hall, "stilt_tower": stilt_tower, "lean_to": lean_to,
          "plaza": plaza, "street": street}

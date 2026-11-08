@@ -290,6 +290,10 @@ def source_needs(path):
     return hut_block, needs
 
 
+def _annex_cells(g, hut_cells):
+    return {(x, z) for (x, _, z) in g.cells} - hut_cells
+
+
 SHELL_SIZES = {
     "round_hut": [{"diameter": d, "wall_height": 3 if d < 13 else 4} for d in (7, 9, 11, 13, 15, 17, 19)],
     "long_hall": [{"width": w, "length": L, "wall_height": 4, "post_spacing": 4}
@@ -319,7 +323,29 @@ def build_auto_hut(hut, culture, pack_dir):
             g = _shift(g, -anchor[0], -anchor[1])
             hx, hz = 1, 0
             keep = {(hx, hz), (hx, hz - 1), (hx, hz + 1), (hx - 1, hz), (hx + 1, hz)} | _door_lane(g)
-            missed = furnish(g, needs, keep, f"{hut['id']}{lv}")
+            outside = set(hut.get("outside", []))
+            inside_needs = [n for n in needs if n[1] not in outside]
+            out_needs = [n for n in needs if n[1] in outside]
+            ann = hut.get("annex")
+            if ann:
+                (_, _, _), (ex, _, _) = g.bounds()
+                ag, _ = FORMS[ann["form"]](ann["params"], pal, culture)
+                _strip(ag)
+                (a0, _, c0), (a1, _, c1) = ag.bounds()
+                dz = -(c0 + c1) // 2 + ann.get("dz", 0)
+                dx = ex + 1 - a0 + ann.get("gap", 0)
+                # inside the main building's cells nothing changes; the annex keeps its own cells
+                hut_cells = set((x, z) for (x, _, z) in g.cells)
+                _merge(g, ag, dx, 0, dz)
+                ann_cells = {(x + dx, z + dz) for (x, _, z) in ag.cells} - hut_cells
+                if out_needs:
+                    out_missed = furnish(g, out_needs, keep | hut_cells, f"{hut['id']}{lv}o")
+                    if out_missed:
+                        inside_needs += out_needs[-len(out_missed):]
+            else:
+                inside_needs += out_needs
+            missed = furnish(g, inside_needs, keep | ({c for c in _annex_cells(g, hut_cells)} if ann else set()),
+                             f"{hut['id']}{lv}")
             if not missed or si == len(sizes) - 1:
                 done = (lv, g, missed, si)
                 break
