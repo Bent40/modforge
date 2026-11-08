@@ -19,7 +19,7 @@ import yaml
 from . import blueprint as bp
 from .forms import FORMS
 from .grid import Palette, Grid
-from .nbt import Byte, Short
+from .nbt import Byte, Short, IntArray
 
 SUB = "structurize:blocksubstitution"
 DIRS = {"north": (0, -1), "south": (0, 1), "west": (-1, 0), "east": (1, 0)}
@@ -49,6 +49,24 @@ def _te(kind):
         return {"id": "minecraft:furnace", "Items": [], "BurnTime": Short(0), "CookTime": Short(0),
                 "CookTimeTotal": Short(200)}
     return None
+
+
+TE_DEFAULTS = {   # blocks whose tile entity Fortress stores; give ours an empty one too
+    "minecraft:barrel": lambda: {"id": "minecraft:barrel", "Items": []},
+    "minecraft:smoker": lambda: {"id": "minecraft:smoker", "Items": [], "BurnTime": Short(0), "CookTime": Short(0),
+                                 "CookTimeTotal": Short(100)},
+    "minecraft:campfire": lambda: {"id": "minecraft:campfire", "Items": [], "CookingTimes": IntArray([0, 0, 0, 0]),
+                                   "CookingTotalTimes": IntArray([0, 0, 0, 0])},
+    "minecraft:skeleton_skull": lambda: {"id": "minecraft:skull"},
+    "minecraft:crafting_table": None,
+}
+
+
+def _fill_tes(g):
+    for pos, (b, _) in g.cells.items():
+        f = TE_DEFAULTS.get(b)
+        if f and pos not in g.block_entities:
+            g.block_entities[pos] = f()
 
 
 def _strip(g):
@@ -174,6 +192,7 @@ def build_hut(hut, culture):
         keep = {(hx, hz), (hx, hz - 1), (hx, hz + 1), (hx - 1, hz), (hx + 1, hz)} | _door_lane(g)
         missed = furnish(g, _needs(L, pal), keep, f"{hut['id']}{lv}")
         g.connect_fences()
+        _fill_tes(g)
         levels.append((lv, g, missed))
     # union box over all levels, so every level shares one footprint
     xs, ys, zs = [], [], []
