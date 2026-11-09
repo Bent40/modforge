@@ -53,6 +53,13 @@ LOOK = {
     "minecolonies:blockhutcitizen": ("flat", "#d4a017", "#b8860b", "#f0c040"),
     "minecolonies:blockhuttownhall": ("flat", "#d4a017", "#b8860b", "#f0c040"),
     "minecolonies:blockhutbuilder": ("flat", "#d4a017", "#b8860b", "#f0c040"),
+    "minecraft:water": ("noise", "#3f63c8", "#3557b4", "#5478d8"),
+    "minecraft:sand": ("noise", "#dbcf9c", "#c8ba84", "#e6dcae"),
+    "minecraft:spruce_fence_gate": ("planks", "#6b4f2c", "#56401f", "#7e5f36"),
+    "minecolonies:blockhutplantation": ("flat", "#d4a017", "#b8860b", "#f0c040"),
+    "minecolonies:blockhutfisherman": ("flat", "#d4a017", "#b8860b", "#f0c040"),
+    "minecolonies:blockhutbarracks": ("flat", "#d4a017", "#b8860b", "#f0c040"),
+    "minecolonies:blockhutbarrackstower": ("flat", "#d4a017", "#b8860b", "#f0c040"),
     GRASS: ("grass", "#6a9a3c", "#5a8632", "#86603f"),
     FLAME: ("flat", "#ffcf4a", "#ffcf4a", "#ffcf4a"),
 }

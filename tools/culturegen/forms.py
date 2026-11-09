@@ -391,5 +391,82 @@ def pen(p, pal, culture):
     return g, {"cut_y": 3}
 
 
-FORMS = {"pen": pen, "round_hut": round_hut, "long_hall": long_hall, "stilt_tower": stilt_tower, "lean_to": lean_to,
+def plots(p, pal, culture):
+    """Plantation yard: tagged planting cells (the crop grows on top). bamboo on dirt, sugar cane on sand beside a
+    water channel, cactus on sand with nothing beside it. Tags are MineColonies posTags (bamboo / sugar / cactus)."""
+    nb, ns, nc = p.get("bamboo", 0), p.get("sugar", 0), p.get("cactus", 0)
+    W = max(5, min(13, max(nb, (ns + 1) // 2, nc) + 2))
+    inner = W - 2
+    g = Grid()
+    g.tags = []
+    rows = []                                   # (kind, count) per planting row
+    for kind, n in (("bamboo", nb), ("sugar", ns), ("cactus", nc)):
+        per = inner if kind == "bamboo" else (inner * 2 if kind == "sugar" else (inner + 1) // 2)
+        while n > 0:
+            take = min(n, per)
+            rows.append((kind, take))
+            n -= take
+    z = 1
+    layout = []
+    for kind, n in rows:
+        if kind == "sugar":
+            a = (n + 1) // 2
+            layout.append(("sugar", z, a)); layout.append(("water", z + 1, inner)); layout.append(("sugar", z + 2, n - a))
+            z += 4
+        else:
+            layout.append((kind, z, n)); z += 2
+    D = max(z, 3) + 1
+    for x in range(W):
+        for zz in range(D):
+            edge = x in (0, W - 1) or zz in (0, D - 1)
+            _role(g, pal, x, 0, zz, "path")
+            if edge:
+                if zz == 0 and x == W // 2:
+                    g.set(x, 1, zz, "minecraft:spruce_fence_gate", facing="north", open="false", in_wall="false",
+                          powered="false")
+                else:
+                    g.set(x, 1, zz, pal.main("trim"))
+            else:
+                g.air(x, 1, zz); g.air(x, 2, zz); g.air(x, 3, zz)
+    for kind, zz, n in layout:
+        if kind == "water":
+            for x in range(1, W - 1):
+                g.set(x, 0, zz, "minecraft:water", level="0")
+            continue
+        xs = list(range(1, W - 1)) if kind != "cactus" else list(range(1, W - 1, 2))
+        for x in xs[:n]:
+            g.set(x, 0, zz, "minecraft:sand" if kind != "bamboo" else "minecraft:dirt")
+            g.tags.append((x, 0, zz, kind))
+    g.set(0, 2, 0, pal.main("trophy"), rotation=8, powered="false")
+    return g, {"cut_y": 3}
+
+
+def pond(p, pal, culture):
+    """Fishing pond: a water pool two deep with a mud rim and a plank jetty; 'fishing' tags on rim cells."""
+    S, nf = p.get("size", 7), max(1, p.get("fishing", 1))
+    g = Grid()
+    g.tags = []
+    for x in range(S + 2):
+        for z in range(S + 2):
+            if x in (0, S + 1) or z in (0, S + 1):
+                _role(g, pal, x, 0, z, "foundation")
+                g.air(x, 1, z); g.air(x, 2, z)
+            else:
+                g.set(x, 0, z, "minecraft:water", level="0")
+                g.set(x, -1, z, "minecraft:water", level="0")
+                _role(g, pal, x, -2, z, "foundation")
+                g.air(x, 1, z)
+    mid = (S + 1) // 2
+    for z in (1, 2):                            # jetty from the front rim into the pond
+        g.set(mid, 0, z, pal.main("deck"))
+        g.cells.pop((mid, -1, z), None)
+        _role(g, pal, mid, -1, z, "frame")
+    spots = [(mid, 0, 2)] + [(0, 0, z) for z in range(2, S, 2)] + [(S + 1, 0, z) for z in range(2, S, 2)]
+    for (x, y, z) in spots[:nf]:
+        g.tags.append((x, y, z, "fishing"))
+    g.set(0, 1, 0, pal.main("trim")); g.set(0, 2, 0, pal.main("trophy"), rotation=8, powered="false")
+    return g, {"cut_y": 3}
+
+
+FORMS = {"plots": plots, "pond": pond, "pen": pen, "round_hut": round_hut, "long_hall": long_hall, "stilt_tower": stilt_tower, "lean_to": lean_to,
          "plaza": plaza, "street": street}

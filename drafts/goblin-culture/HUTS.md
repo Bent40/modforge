@@ -45,3 +45,15 @@ Pack inventory (scripted, 313 hut blueprints, ~50 hut types):
 - **C. Keep the reskin**: decorations, infrastructure (roads, rails, mineshafts, adapters), walls, crop fields
   (blockhutfield / plantationfield): terrain-shaped or not huts.
 Order: A first (biggest win), then B one by one, previews per category for Ben.
+
+## Special huts (2026-11-09)
+
+- **Barracks**: long hall (9 wide, 19 long) holding one bunk alcove per level, copied from the reskinned
+  `military/barrackstower1` with each alcove's child `barrackstower` hut block and tile entity kept, so
+  MineColonies still counts the towers. Level 5 adds chests and a furnace. Sheet: `colony/all/goblin_special_huts.png`.
+- **Plantation**: round hut plus a fenced `plots` annex: bamboo and cactus rows on sand, sugar cane rows beside a
+  water channel. Tags: bamboo/sugar/cactus 4 each at level 1, 20 each at level 5, none on a bad block.
+- **Fisherman**: round hut plus a stone-rimmed `pond` annex, two deep, with a plank jetty; `fishing` tags on rim
+  cells beside water. All five levels share the pond (the job needs nothing else).
+- **Kept on the reskin**: gatehouse (gate/archer/knight/stand tags wired to its wall gate), miner (the mineshaft
+  plus an embedded mineguard tower). Revisit only if they look out of place in game.

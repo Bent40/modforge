@@ -173,6 +173,9 @@ spec:
           - { form: lean_to, params: { width: 11, depth: 5 }, racks: 6, furnaces: 2 }
           - { form: lean_to, params: { width: 13, depth: 6 }, racks: 8, furnaces: 2 }
     auto_huts:                       # working blocks copied per level from the source pack (reskin.source_pack)
+      - { id: barracks, source: military/barracks, shell: barracks, tower_source: military/barrackstower }
+      - { id: plantation, source: agriculture/horticulture/plantation, shell: round_hut, annex: { form: plots, tag_params: [bamboo, sugar, cactus] } }
+      - { id: fisherman,  source: agriculture/husbandry/fisherman,     shell: round_hut, annex: { form: pond, params: { size: 7 }, tag_params: [fishing] } }
       - { id: blacksmith, source: craftsmanship/metallurgy/blacksmith, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:anvil, minecraft:chipped_anvil, minecraft:blast_furnace, minecraft:smithing_table, minecraft:grindstone, minecraft:furnace] }
       - { id: mechanic, source: craftsmanship/metallurgy/mechanic, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:anvil, minecraft:chipped_anvil, minecraft:blast_furnace, minecraft:smithing_table, minecraft:grindstone, minecraft:furnace] }
       - { id: smeltery, source: craftsmanship/metallurgy/smeltery, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:anvil, minecraft:chipped_anvil, minecraft:blast_furnace, minecraft:smithing_table, minecraft:grindstone, minecraft:furnace] }

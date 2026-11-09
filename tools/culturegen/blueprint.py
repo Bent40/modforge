@@ -49,7 +49,8 @@ def idx(root, x, y, z):
     return (y * root["size_z"] + z) * root["size_x"] + x
 
 
-def from_grid(grid, name, hut_block, hut_pos, hut_facing="north", required_mods=("minecolonies",), architects=()):
+def from_grid(grid, name, hut_block, hut_pos, hut_facing="north", required_mods=("minecolonies",), architects=(),
+              tags=()):
     """Turn a culturegen Grid into a blueprint with the hut block at hut_pos (grid coords, after normalise)."""
     grid.normalise()
     grid.set(*hut_pos, hut_block, facing=hut_facing)
@@ -81,7 +82,7 @@ def from_grid(grid, name, hut_block, hut_pos, hut_facing="north", required_mods=
         "blueprintDataProvider": {
             "corner1": {"x": -hx, "y": -hy, "z": -hz},
             "corner2": {"x": sx - 1 - hx, "y": sy - 1 - hy, "z": sz - 1 - hz},
-            "path": name, "schematicName": stem, "pack": "", "posTagMap": []},
+            "path": name, "schematicName": stem, "pack": "", "posTagMap": _tag_map(tags, hut_pos)},
     })
     return {
         "version": Byte(1), "size_x": Short(sx), "size_y": Short(sy), "size_z": Short(sz),
@@ -90,6 +91,15 @@ def from_grid(grid, name, hut_block, hut_pos, hut_facing="north", required_mods=
         "mcversion": MC_VERSION,
         "optional_data": {"structurize": {"primary_offset": {"x": hx, "y": hy, "z": hz}}},
     }
+
+
+def _tag_map(tags, hut_pos):
+    """[(x, y, z, name)] in grid coords -> MineColonies posTagMap, positions relative to the hut block."""
+    by = {}
+    for x, y, z, n in tags:
+        by.setdefault((x - hut_pos[0], y - hut_pos[1], z - hut_pos[2]), []).append(n)
+    return [{"tagPos": {"x": x, "y": y, "z": z}, "tagNameList": [{"tagName": n} for n in ns]}
+            for (x, y, z), ns in sorted(by.items())]
 
 
 def to_grid(root):

@@ -82,12 +82,15 @@ def _strip(g):
 
 def _shift(g, dx, dz):
     out = Grid()
+    out.tags = [(x + dx, y, z + dz, n) for (x, y, z, n) in getattr(g, "tags", [])]
     out.cells = {(x + dx, y, z + dz): v for (x, y, z), v in g.cells.items()}
     out.block_entities = {(x + dx, y, z + dz): v for (x, y, z), v in g.block_entities.items()}
     return out
 
 
 def _merge(g, other, dx, dy, dz):
+    if getattr(other, "tags", None):
+        g.tags = getattr(g, "tags", []) + [(x + dx, y + dy, z + dz, n) for (x, y, z, n) in other.tags]
     for (x, y, z), v in other.cells.items():
         g.cells[(x + dx, y + dy, z + dz)] = v
     for (x, y, z), v in other.block_entities.items():
@@ -246,6 +249,17 @@ SIGNATURE = {"minecraft:anvil": 2, "minecraft:chipped_anvil": 1, "minecraft:grin
              "minecraft:composter": 2, "minecraft:bookshelf": 8, "minecraft:crafting_table": 2}
 
 
+def source_tags(path):
+    root = bp.read(path)
+    out = {}
+    for t in root["tile_entities"]:
+        if t["id"] == "minecolonies:colonybuilding":
+            for e in t.get("blueprintDataProvider", {}).get("posTagMap", []):
+                for n in e["tagNameList"]:
+                    out[n["tagName"]] = out.get(n["tagName"], 0) + 1
+    return out
+
+
 def source_needs(path):
     """(hut_block, needs) from a source blueprint: every working block, with its tile entity as a template."""
     root = bp.read(path)
@@ -329,7 +343,10 @@ def build_auto_hut(hut, culture, pack_dir):
             ann = hut.get("annex")
             if ann:
                 (_, _, _), (ex, _, _) = g.bounds()
-                ag, _ = FORMS[ann["form"]](ann["params"], pal, culture)
+                aparams = dict(ann.get("params", {}))
+                for k in ann.get("tag_params", []):          # e.g. plots: bamboo/sugar/cactus from the source
+                    aparams[k] = source_tags(src).get(k, 0)
+                ag, _ = FORMS[ann["form"]](aparams, pal, culture)
                 _strip(ag)
                 (a0, _, c0), (a1, _, c1) = ag.bounds()
                 dz = -(c0 + c1) // 2 + ann.get("dz", 0)
@@ -356,6 +373,61 @@ def build_auto_hut(hut, culture, pack_dir):
     return _share_footprint(levels, (1, 0)), hut_block
 
 
+def build_barracks(hut, culture, pack_dir):
+    """Barracks = a longhall with k bunk alcoves, each a child barracks-tower hut (MineColonies upgrades the
+    child from its own <tower>N.blueprint, which the source pack keeps). k per level comes from the source."""
+    tower_src = bp.read(os.path.join(pack_dir, hut["tower_source"] + "1.blueprint"))
+    tsx, tsy, tsz = tower_src["size_x"], tower_src["size_y"], tower_src["size_z"]
+    tflat = bp.unpack_blocks(tower_src["blocks"], tsx * tsy * tsz)
+    ttes = {(t["x"], t["y"], t["z"]): t for t in tower_src["tile_entities"]}
+    levels = []
+    for lv in range(1, 6):
+        src = os.path.join(pack_dir, f"{hut['source']}{lv}.blueprint")
+        root = bp.read(src)
+        child_tpl = [t for t in root["tile_entities"] if t["id"] == "minecolonies:colonybuilding"
+                     and "tower" in str(t.get("type", ""))]
+        k = len(child_tpl)
+        hb, needs = source_needs(src)
+        needs = [n for n in needs if n[0] != "bed" and n[1] != "minecolonies:blockhutbarrackstower"]
+        racks = [n for n in needs if n[1] == "minecolonies:blockminecoloniesrack"]
+        needs = [n for n in needs if n[1] != "minecolonies:blockminecoloniesrack"] + racks[k:]
+        pal = Palette(culture["palette"], seed=zlib.crc32(f"{hut['id']}{lv}".encode()))
+        params = {"width": 9, "length": 19, "wall_height": 4, "post_spacing": 4}
+        g, _ = FORMS["long_hall"](params, pal, culture)
+        _strip(g)
+        x0, z0 = 1, 1
+        zs = z0 + 2
+        for i in range(k):
+            ox, oz = x0 + 1, zs + 4 * i
+            for ty in range(1, tsy):
+                for tz in range(tsz):
+                    for tx in range(tsx):
+                        e = tower_src["palette"][tflat[(ty * tsz + tz) * tsx + tx]]
+                        n = e["Name"]
+                        if n.startswith("structurize:"):
+                            continue
+                        props = {kk: str(v) for kk, v in e.get("Properties", {}).items()}
+                        g.cells[(ox + tx, ty, oz + tz)] = (n, props)
+                        te = ttes.get((tx, ty, tz))
+                        if te is not None:
+                            t = {kk: v for kk, v in te.items() if kk not in ("x", "y", "z", "pos")}
+                            if n.startswith("minecolonies:blockhut"):
+                                t = {kk: v for kk, v in child_tpl[i].items() if kk not in ("x", "y", "z", "pos")}
+                            g.block_entities[(ox + tx, ty, oz + tz)] = t
+            for tx in range(tsx):                     # corridor row in front of each alcove stays clear
+                g.air(ox + tx, 1, oz - 1)
+        anchor = _anchor(g, "long_hall", params)
+        g = _shift(g, -anchor[0], -anchor[1])
+        corridor = {(x, z) for (x, y, z), c in g.cells.items() if y == 1 and c[0] == "minecraft:air"
+                    and x <= 0 and (z - (zs - anchor[1])) % 4 == 3}
+        keep = {(1, 0), (1, -1), (1, 1), (0, 0), (2, 0)} | _door_lane(g) | corridor
+        missed = furnish(g, needs, keep, f"{hut['id']}{lv}")
+        g.connect_fences()
+        _fill_tes(g)
+        levels.append((lv, g, missed))
+    return _share_footprint(levels, (1, 0)), "minecolonies:blockhutbarracks"
+
+
 def _share_footprint(levels, hut_at):
     xs, ys, zs = [], [], []
     for _, g, _ in levels:
@@ -367,6 +439,7 @@ def _share_footprint(levels, hut_at):
         for corner in (lo, hi):
             if corner not in g.cells:
                 g.set(*corner, SUB)
+        g.tags = [(x - lo[0], y - lo[1], z - lo[2], n) for (x, y, z, n) in getattr(g, "tags", [])]
         g.normalise()
         hx, hz = hut_at
         out.append((lv, g, (hx - lo[0], 1 - lo[1], hz - lo[2]), missed))
@@ -415,7 +488,7 @@ def main(argv):
         for hut in culture["colony"].get("auto_huts", []):
             if only and hut["id"] not in only:
                 continue
-            lvls, hb = build_auto_hut(hut, culture, src_pack)
+            lvls, hb = (build_barracks if hut.get("shell") == "barracks" else build_auto_hut)(hut, culture, src_pack)
             jobs.append((dict(hut, hut_block=hb), lvls))
     for hut, built in jobs:
         sub = os.path.dirname(hut.get("source", ""))
@@ -429,7 +502,7 @@ def main(argv):
                 render(g, os.path.join(pdir, f"{hut['id']}{lv}_front.png"), scale=4)
                 render(g, os.path.join(pdir, f"{hut['id']}{lv}_cutaway.png"), scale=4, cut_y=hut.get("cut_y", 3))
             root = bp.from_grid(g, name, hut["hut_block"], hut_pos, hut_facing="north",
-                                architects=["culturegen"])
+                                architects=["culturegen"], tags=getattr(g, "tags", []))
             bp.write(os.path.join(bdir, rel), root)
             back = bp.read(os.path.join(bdir, rel))
             counts = {}
