@@ -1,0 +1,15 @@
+{
+  "icon": "goblin.png",
+  "name": "Dwarf Preview",
+  "authors": [
+    "culturegen"
+  ],
+  "desc": "Hand-designed dwarf (Create) buildings, preview.",
+  "mods": [
+    "structurize",
+    "minecolonies",
+    "create"
+  ],
+  "version": "1",
+  "pack-format": "1"
+}

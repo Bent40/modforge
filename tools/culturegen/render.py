@@ -79,6 +79,27 @@ LOOK = {
     "minecraft:calcite": ("noise", "#dfe0dc", "#cfd0cc", "#ebece8"),
     "minecraft:deepslate_tiles": ("bricks", "#36363a", "#26262a", "#46464a"),
     "minecraft:bell": ("flat", "#e0b030", "#c09020", "#f0c840"),
+    "minecraft:deepslate_bricks": ("bricks", "#4a4a4f", "#36363a", "#56565b"),
+    "minecraft:cracked_deepslate_bricks": ("bricks", "#45454a", "#2e2e32", "#56565b"),
+    "minecraft:deepslate_brick_stairs": ("bricks", "#4a4a4f", "#36363a", "#56565b"),
+    "minecraft:polished_deepslate": ("noise", "#48484d", "#3e3e43", "#525257"),
+    "minecraft:deepslate_tile_stairs": ("bricks", "#36363a", "#26262a", "#46464a"),
+    "minecraft:deepslate_tile_slab": ("bricks", "#36363a", "#26262a", "#46464a"),
+    "minecraft:polished_andesite": ("noise", "#848786", "#7a7d7c", "#8f9291"),
+    "minecraft:andesite": ("noise", "#888888", "#727272", "#9a9a9a"),
+    "create:andesite_casing": ("planks", "#9a9a92", "#6a5a42", "#b0b0a8"),
+    "create:brass_casing": ("planks", "#c49a3a", "#7a5a28", "#e0b850"),
+    "create:framed_glass": ("bricks", "#a8c8d8", "#5a5a52", "#c8e0ec"),
+    "minecraft:waxed_cut_copper": ("bricks", "#c06a4a", "#9a5038", "#d88060"),
+    "minecraft:waxed_cut_copper_slab": ("bricks", "#c06a4a", "#9a5038", "#d88060"),
+    "minecraft:bricks": ("bricks", "#985a48", "#b0b0a8", "#a8685a"),
+    "minecraft:lantern": ("flat", "#3a3a40", "#3a3a40", "#ffcf4a"),
+    "create:cogwheel": ("planks", "#a07a4a", "#7a5a32", "#b08a5a"),
+    "create:large_cogwheel": ("planks", "#a07a4a", "#7a5a32", "#b08a5a"),
+    "create:shaft": ("flat", "#8a8a84", "#8a8a84", "#8a8a84"),
+    "create:water_wheel": ("planks", "#8a6a3e", "#5b4226", "#a07c4a"),
+    "minecraft:lightning_rod": ("flat", "#c06a4a", "#c06a4a", "#c06a4a"),
+    "minecraft:dark_oak_door": ("planks", "#43301a", "#352512", "#523b20"),
     GRASS: ("grass", "#6a9a3c", "#5a8632", "#86603f"),
     FLAME: ("flat", "#ffcf4a", "#ffcf4a", "#ffcf4a"),
 }
@@ -154,6 +175,20 @@ def _shape(name, props):
             x0, x1 = N - th, N
         return ((x0, y0, z0), (x1, y1, z1))
 
+    if name in ("create:cogwheel", "create:large_cogwheel", "create:water_wheel", "create:shaft"):
+        r = {"create:cogwheel": 4, "create:large_cogwheel": 10, "create:water_wheel": 12, "create:shaft": 1}[name]
+        a, b = N // 2 - r, N // 2 + r
+        th = (3, 5) if name != "create:shaft" else (0, N)
+        ax = props.get("axis", "y")
+        if ax == "z":
+            return [(((a, a, th[0]), (b, b, th[1])), name)]
+        if ax == "x":
+            return [(((th[0], a, a), (th[1], b, b)), name)]
+        return [(((a, th[0], a), (b, th[1], b)), name)]
+    if name == "minecraft:lantern":
+        return [(((2, 0, 2), (6, 5, 6)), name), (((3, 1, 3), (5, 4, 5)), FLAME)]
+    if name == "minecraft:lightning_rod":
+        return [(((3, 0, 3), (5, N, 5)), name)]
     if name.endswith("_slab"):
         t = props.get("type", "bottom")
         return [(full, name)] if t == "double" else [(((0, 0, 0), (N, h, N)) if t == "bottom" else ((0, h, 0), (N, N, N)), name)]
