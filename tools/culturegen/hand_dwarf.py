@@ -211,6 +211,18 @@ def _water_wheel(g, x, zc, H):
         g.set(wx, -1, z, "minecraft:water", level="0")
         g.set(wx, 0, z, "minecraft:water", level="0")
     g.set(wx, 2, zc, "create:large_water_wheel", axis="x", extension="false", waterlogged="false")
+    # Create wheels only turn on FLOWING water against the blades: a stone cistern on a chute behind the wheel
+    # drops a waterfall down the rim (z = zc+2, y 1..4) into the race, so the wheel spins as soon as it is pasted.
+    zf = zc + 2
+    for y in range(1, 6):                        # chute cheeks either side of the falling column
+        for xx in (wx - 1, wx + 1):
+            g.set(xx, y, zf, P["plinth"])
+        g.set(wx, y, zf + 1, P["plinth"])        # chute back wall
+    for y in range(1, 5):
+        g.air(wx, y, zf)                         # the fall itself (the source above fills it)
+    g.set(wx, 5, zf, "minecraft:water", level="0")
+    g.set(wx, 5, zf - 1, P["plinth"])            # cistern front lip, above the wheel's top rim
+    g.set(wx, 6, zf, P["plinth"])                # cistern lid
     for xx in range(wx + 1, 1):                  # through the skirt and the wall
         g.set(xx, 2, zc, P["shaft"], axis="x")
     g.set(1, 2, zc, "create:gearbox", axis="z")
