@@ -10,4 +10,12 @@ copper ridge, twin brick chimneys, a gear clock tower with a copper finial, a co
 wheel on the west wall.
 
 - `previews/`: iso renders. `pack/dwarf_preview/`: loose Structurize pack (fundamentals/townhall1) for paste tests.
-- Next: residence, smithy (signature workshop), then levels 1-5 and the generator for the long tail.
+- Residence (`dwarf_house`): dug-in deepslate ground storey (kitchen, table, straight stair), jettied andesite
+  upper storey on casing posts with corbels (beds, chests), brick chimney, copper water tank on a stand.
+- Smithy (`dwarf_smithy`): forge hall with a 5-wide open front under a stone lintel, 3x3 brick forge stack with the
+  fire seen behind iron bars, blast furnaces, anvil, grindstone, quench cauldron, a Create press over a depot turned
+  by a hand crank through the wall, and a coal/ore lean-to.
+- Town hall water wheel: cistern and chute drop a waterfall down the rim (Create wheels need flowing water).
+- Pack now holds townhall1, residence1, blacksmith1. Untested in game: fluid_tank, fluid_pipe, depot,
+  mechanical_press, hand_crank, and whether the wheel spins.
+- Next: levels 1-5 for these three, then the generator for the long tail.
