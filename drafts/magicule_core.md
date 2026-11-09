@@ -84,3 +84,33 @@ verify:
    Chromeware's registration is verified.
 2. **Above-max magicule.** `economy_binding.capacity: none` stays true, but `overcharge` is a new kind of
    binding. If Ben keeps it, the item lane needs a rule for it (temporary, bleeding, risk-capped).
+
+## Sibling: `octo_spine_port` (built in isekai_cyborg 0.2.0, 2026-11-09)
+
+Same envelope as the Core: `type: item`, `modid: isekai_cyborg`, `build_target: vanilla_codemodel`,
+implant section `skeleton`, 43 capacity (0 for the Cyborg race), installed seated in `chromeware:surgery_chair`.
+Gates the Octo Arms (tentaworks) Tentacle Rig via a mixin on `RigServer.process`. Recipe: Create sequenced
+assembly, brass sheet -> precision mechanism -> 2 andesite alloy -> 1 magic ore shard. Palette = the Core's.
+
+```
+sprite octo_spine_port_16:   # row 0 = top
+  - "0000000000000000"
+  - "0000007777000000"
+  - "0000072332700000"
+  - "0000721111270000"
+  - "0000077777700000"
+  - "0000007227000000"
+  - "0007777777777000"
+  - "0072233663322700"
+  - "0072211441122700"
+  - "0007777777777000"
+  - "0000007227000000"
+  - "0000077777700000"
+  - "0000721111270000"
+  - "0000072332700000"
+  - "0000007777000000"
+  - "0000000000000000"
+verify:
+  - without the port, double-jump with a Tentacle Rig: no arms, action bar "Needs a spine port (Ripperdoc)"
+  - with the port installed: arms deploy; backtank air drains as normal
+```
