@@ -380,7 +380,7 @@ def pen(p, pal, culture):
             _role(g, pal, x, 0, z, "floor" if p.get("floor") != "path" else "path")
             if x in (0, m) or z in (0, b):
                 if z == 0 and x == Wd // 2:
-                    g.set(x, 1, z, "minecraft:spruce_fence_gate", facing="north", open="false", in_wall="false",
+                    g.set(x, 1, z, pal.main("trim") + "_gate", facing="north", open="false", in_wall="false",
                           powered="false")
                 else:
                     g.set(x, 1, z, pal.main("trim"))
@@ -422,7 +422,7 @@ def plots(p, pal, culture):
             _role(g, pal, x, 0, zz, "path")
             if edge:
                 if zz == 0 and x == W // 2:
-                    g.set(x, 1, zz, "minecraft:spruce_fence_gate", facing="north", open="false", in_wall="false",
+                    g.set(x, 1, zz, pal.main("trim") + "_gate", facing="north", open="false", in_wall="false",
                           powered="false")
                 else:
                     g.set(x, 1, zz, pal.main("trim"))

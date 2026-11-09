@@ -312,7 +312,19 @@ SHELL_SIZES = {
     "round_hut": [{"diameter": d, "wall_height": 3 if d < 13 else 4} for d in (7, 9, 11, 13, 15, 17, 19)],
     "long_hall": [{"width": w, "length": L, "wall_height": 4, "post_spacing": 4}
                   for w in (9, 11) for L in range(11, 48, 4)],
+    # small square timber house (a long_hall from 7x7 up), for cultures that map round_hut -> house
+    "house": [{"width": w, "length": L, "wall_height": 4, "post_spacing": 3 if L < 9 else 4}
+              for w, L in ((7, 7), (7, 9), (9, 9), (9, 11), (9, 13), (11, 13), (11, 15), (11, 17), (11, 21))],
 }
+SHELL_FORM = {"house": "long_hall"}
+
+
+def _culture_needs(needs, culture):
+    """Swap copied beds to the culture's bed block (palette role 'bed'), keeping the source's bed count."""
+    bed = next(iter(culture["palette"]["bed"])) if "bed" in culture["palette"] else None
+    if not bed:
+        return needs
+    return [(k, bed, dict(p, _block=bed) if "_block" in p else p) if k == "bed" else (k, n, p) for k, n, p in needs]
 
 
 def build_auto_hut(hut, culture, pack_dir):
@@ -326,14 +338,17 @@ def build_auto_hut(hut, culture, pack_dir):
     for src in srcs:
         lv = int(os.path.basename(src)[len(os.path.basename(hut["source"])):].split(".")[0])
         hb, needs = source_needs(src)
+        needs = _culture_needs(needs, culture)
         hut_block = hut_block or hb
-        sizes = SHELL_SIZES[hut["shell"]]
+        shell = culture["colony"].get("shell_map", {}).get(hut["shell"], hut["shell"])
+        form = SHELL_FORM.get(shell, shell)
+        sizes = SHELL_SIZES[shell]
         done = None
         for si in range(floor, len(sizes)):
             pal = Palette(culture["palette"], seed=zlib.crc32(f"{hut['id']}{lv}".encode()))
-            g, _ = FORMS[hut["shell"]](sizes[si], pal, culture)
+            g, _ = FORMS[form](sizes[si], pal, culture)
             _strip(g)
-            anchor = _anchor(g, hut["shell"], sizes[si])
+            anchor = _anchor(g, form, sizes[si])
             g = _shift(g, -anchor[0], -anchor[1])
             hx, hz = 1, 0
             keep = {(hx, hz), (hx, hz - 1), (hx, hz + 1), (hx - 1, hz), (hx + 1, hz)} | _door_lane(g)

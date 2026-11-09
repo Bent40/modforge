@@ -55,6 +55,7 @@ LOOK = {
     "minecolonies:blockhutbuilder": ("flat", "#d4a017", "#b8860b", "#f0c040"),
     "minecraft:water": ("noise", "#3f63c8", "#3557b4", "#5478d8"),
     "minecraft:sand": ("noise", "#dbcf9c", "#c8ba84", "#e6dcae"),
+    "minecraft:dark_oak_fence_gate": ("planks", "#43301a", "#352512", "#523b20"),
     "minecraft:spruce_fence_gate": ("planks", "#6b4f2c", "#56401f", "#7e5f36"),
     "minecolonies:blockhutplantation": ("flat", "#d4a017", "#b8860b", "#f0c040"),
     "minecolonies:blockhutfisherman": ("flat", "#d4a017", "#b8860b", "#f0c040"),
