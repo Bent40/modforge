@@ -77,6 +77,8 @@ LOOK = {
     "minecraft:gravel": ("noise", "#857f7c", "#6e6866", "#9a9490"),
     "minecraft:white_terracotta": ("noise", "#d2b2a1", "#c4a493", "#dcbcab"),
     "minecraft:calcite": ("noise", "#dfe0dc", "#cfd0cc", "#ebece8"),
+    "minecraft:deepslate_tiles": ("bricks", "#36363a", "#26262a", "#46464a"),
+    "minecraft:bell": ("flat", "#e0b030", "#c09020", "#f0c840"),
     GRASS: ("grass", "#6a9a3c", "#5a8632", "#86603f"),
     FLAME: ("flat", "#ffcf4a", "#ffcf4a", "#ffcf4a"),
 }

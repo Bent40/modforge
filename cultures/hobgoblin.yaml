@@ -82,19 +82,21 @@ spec:
               annex: [ { form: lean_to, params: { width: 5, depth: 4 }, at: [7, -1] } ] }   # work shed beside the house
       - id: townhall
         hut_block: minecolonies:blockhuttownhall
+        features: [porch, banners, bell_spire]   # tallest, most ornate building in the village
         hut_block_at: [1, 0]
         cut_y: 3
         levels:
-          - { form: long_hall, params: { width: 9, length: 11, wall_height: 4, post_spacing: 4 }, beds: 1, racks: 1, chests: 2, furnaces: 1 }
-          - { form: long_hall, params: { width: 9, length: 15, wall_height: 4, post_spacing: 4 }, beds: 1, racks: 2, chests: 2, furnaces: 1 }
-          - { form: long_hall, params: { width: 9, length: 19, wall_height: 4, post_spacing: 4 }, beds: 3, racks: 4, chests: 4, furnaces: 2, stash: 1 }
-          - { form: long_hall, params: { width: 9, length: 23, wall_height: 4, post_spacing: 4 }, beds: 6, racks: 6, chests: 6, furnaces: 2, stash: 1,
-              annex: [ { form: stilt_tower, params: { width: 5, deck_height: 6, rail_height: 1, roof_height: 3 }, at: [6, 5] } ] }
-          - { form: long_hall, params: { width: 9, length: 27, wall_height: 4, post_spacing: 4 }, beds: 11, racks: 8, chests: 8, furnaces: 3, stash: 1,
-              annex: [ { form: stilt_tower, params: { width: 5, deck_height: 6, rail_height: 1, roof_height: 3 }, at: [6, 7] },
-                       { form: stilt_tower, params: { width: 5, deck_height: 6, rail_height: 1, roof_height: 3 }, at: [-10, 7] } ] }
+          - { form: long_hall, params: { width: 9, length: 11, wall_height: 6, post_spacing: 4 }, beds: 1, racks: 1, chests: 2, furnaces: 1 }
+          - { form: long_hall, params: { width: 9, length: 15, wall_height: 6, post_spacing: 4 }, beds: 1, racks: 2, chests: 2, furnaces: 1 }
+          - { form: long_hall, params: { width: 9, length: 19, wall_height: 6, post_spacing: 4 }, beds: 3, racks: 4, chests: 4, furnaces: 2, stash: 1 }
+          - { form: long_hall, params: { width: 9, length: 23, wall_height: 6, post_spacing: 4 }, beds: 6, racks: 6, chests: 6, furnaces: 2, stash: 1,
+              annex: [ { form: stilt_tower, params: { width: 5, deck_height: 10, rail_height: 1, roof_height: 4 }, at: [6, 5] } ] }
+          - { form: long_hall, params: { width: 9, length: 27, wall_height: 6, post_spacing: 4 }, beds: 11, racks: 8, chests: 8, furnaces: 3, stash: 1,
+              annex: [ { form: stilt_tower, params: { width: 5, deck_height: 10, rail_height: 1, roof_height: 4 }, at: [6, 7] },
+                       { form: stilt_tower, params: { width: 5, deck_height: 10, rail_height: 1, roof_height: 4 }, at: [-10, 7] } ] }
       - id: builder
         hut_block: minecolonies:blockhutbuilder
+        features: [log_pile]
         hut_block_at: [0, -2]         # middle of the shed floor
         cut_y: 3
         levels:
@@ -103,15 +105,22 @@ spec:
           - { form: lean_to, params: { width: 9,  depth: 5 }, racks: 4, furnaces: 2 }
           - { form: lean_to, params: { width: 11, depth: 5 }, racks: 6, furnaces: 2 }
           - { form: lean_to, params: { width: 13, depth: 6 }, racks: 8, furnaces: 2 }
+    groups:                          # per job group: palette overrides + role markers (tools/culturegen/features.py)
+      fundamentals:  { features: [porch] }
+      craftsmanship: { palette: { wall: { minecraft:stone_bricks: 4, minecraft:cobblestone: 1 } }, features: [chimney] }
+      agriculture:   { palette: { wall: { minecraft:spruce_planks: 1 }, thatch: { minecraft:hay_block: 1 } }, features: [drying_rack] }
+      military:      { palette: { wall: { minecraft:cobblestone: 3, minecraft:stone_bricks: 1 } }, features: [palisade] }
+      education:     { palette: { wall: { minecraft:calcite: 1 }, thatch: { minecraft:deepslate_tiles: 1 } }, features: [banners] }
+      mystic:        { palette: { wall: { minecraft:calcite: 1 }, thatch: { minecraft:deepslate_tiles: 1 } }, features: [banners] }
     shell_map: { round_hut: house }  # hobgoblins build square timber houses, not round huts
     auto_huts:                       # working blocks copied per level from the source pack (reskin.source_pack)
       - { id: barracks, source: military/barracks, shell: barracks, tower_source: military/barrackstower }
-      - { id: plantation, source: agriculture/horticulture/plantation, shell: round_hut, annex: { form: plots, tag_params: [bamboo, sugar, cactus] } }
-      - { id: fisherman,  source: agriculture/husbandry/fisherman,     shell: round_hut, annex: { form: pond, params: { size: 7 }, tag_params: [fishing] } }
+      - { id: plantation, source: agriculture/horticulture/plantation, shell: round_hut, annex: { form: plots, tag_params: [bamboo, sugar, cactus] }, features: [] }
+      - { id: fisherman,  source: agriculture/husbandry/fisherman,     shell: round_hut, annex: { form: pond, params: { size: 7 }, tag_params: [fishing] }, features: [] }
       - { id: blacksmith, source: craftsmanship/metallurgy/blacksmith, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:anvil, minecraft:chipped_anvil, minecraft:blast_furnace, minecraft:smithing_table, minecraft:grindstone, minecraft:furnace] }
       - { id: mechanic, source: craftsmanship/metallurgy/mechanic, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:anvil, minecraft:chipped_anvil, minecraft:blast_furnace, minecraft:smithing_table, minecraft:grindstone, minecraft:furnace] }
       - { id: smeltery, source: craftsmanship/metallurgy/smeltery, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:anvil, minecraft:chipped_anvil, minecraft:blast_furnace, minecraft:smithing_table, minecraft:grindstone, minecraft:furnace] }
-      - { id: sawmill, source: craftsmanship/carpentry/sawmill, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:stonecutter, minecraft:crafting_table] }
+      - { id: sawmill, source: craftsmanship/carpentry/sawmill, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:stonecutter, minecraft:crafting_table], features: [log_pile] }
       - { id: fletcher, source: craftsmanship/carpentry/fletcher, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:fletching_table] }
       - { id: alchemist, source: craftsmanship/luxury/alchemist, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:cauldron, minecraft:water_cauldron, minecraft:brewing_stand] }
       - { id: baker, source: craftsmanship/luxury/baker, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:smoker, minecraft:furnace] }
@@ -123,15 +132,15 @@ spec:
       - { id: sifter, source: craftsmanship/masonry/sifter, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } } }
       - { id: stonemason, source: craftsmanship/masonry/stonemason, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:stonecutter] }
       - { id: stonesmeltery, source: craftsmanship/masonry/stonesmeltery, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:furnace, minecraft:blast_furnace] }
-      - { id: deliveryman, source: craftsmanship/storage/deliveryman, shell: round_hut }
-      - { id: warehouse, source: craftsmanship/storage/warehouse, shell: long_hall }
+      - { id: deliveryman, source: craftsmanship/storage/deliveryman, shell: round_hut, features: [porch] }
+      - { id: warehouse, source: craftsmanship/storage/warehouse, shell: long_hall, features: [banners] }
       - { id: library, source: education/library, shell: long_hall }
       - { id: school, source: education/school, shell: long_hall }
       - { id: university, source: education/university, shell: long_hall }
-      - { id: cook, source: fundamentals/cook, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:smoker] }
-      - { id: hospital, source: fundamentals/hospital, shell: long_hall }
-      - { id: lumberjack, source: fundamentals/lumberjack, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } } }
-      - { id: tavern, source: fundamentals/tavern, shell: long_hall }
+      - { id: cook, source: fundamentals/cook, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, outside: [minecraft:smoker], features: [chimney, porch] }
+      - { id: hospital, source: fundamentals/hospital, shell: long_hall, features: [porch, banners] }
+      - { id: lumberjack, source: fundamentals/lumberjack, shell: round_hut, annex: { form: lean_to, params: { width: 7, depth: 4 } }, features: [log_pile, porch] }
+      - { id: tavern, source: fundamentals/tavern, shell: long_hall, features: [porch, banners, chimney] }
       - { id: chickenherder, source: agriculture/husbandry/chickenherder, shell: round_hut, annex: { form: pen, params: { width: 9, depth: 9 } } }
       - { id: cowboy, source: agriculture/husbandry/cowboy, shell: round_hut, annex: { form: pen, params: { width: 9, depth: 9 } } }
       - { id: rabbithutch, source: agriculture/husbandry/rabbithutch, shell: round_hut, annex: { form: pen, params: { width: 9, depth: 9 } } }
@@ -141,8 +150,8 @@ spec:
       - { id: composter, source: agriculture/horticulture/composter, shell: round_hut, annex: { form: pen, params: { width: 7, depth: 7 } }, outside: [minecolonies:barrel_block] }
       - { id: farmer, source: agriculture/horticulture/farmer, shell: round_hut }
       - { id: florist, source: agriculture/horticulture/florist, shell: round_hut, annex: { form: pen, params: { width: 7, depth: 7 } }, outside: [minecolonies:composted_dirt] }
-      - { id: archery, source: military/archery, shell: long_hall, annex: { form: pen, params: { width: 9, depth: 9 } } }
-      - { id: combatacademy, source: military/combatacademy, shell: long_hall, annex: { form: pen, params: { width: 9, depth: 9 } } }
+      - { id: archery, source: military/archery, shell: long_hall, annex: { form: pen, params: { width: 9, depth: 9 } }, features: [banners] }
+      - { id: combatacademy, source: military/combatacademy, shell: long_hall, annex: { form: pen, params: { width: 9, depth: 9 } }, features: [banners] }
       - { id: guardtower, source: military/guardtower, shell: round_hut }
       - { id: enchanter, source: mystic/enchanter, shell: round_hut }
       - { id: graveyard, source: mystic/graveyard, shell: round_hut, annex: { form: pen, params: { width: 13, depth: 13 } }, outside: [minecolonies:blockminecoloniesnamedgrave] }

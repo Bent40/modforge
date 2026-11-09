@@ -18,12 +18,33 @@ import yaml
 
 from . import blueprint as bp
 from .forms import FORMS
+from . import features as feat
 from .grid import Palette, Grid
 from .nbt import Byte, Short, IntArray
 
 SUB = "structurize:blocksubstitution"
 DIRS = {"north": (0, -1), "south": (0, 1), "west": (-1, 0), "east": (1, 0)}
 OPP = {"north": "south", "south": "north", "west": "east", "east": "west"}
+
+
+def _group(hut):
+    return hut.get("group") or (hut["source"].split("/")[0] if "source" in hut else "fundamentals")
+
+
+def _roles(culture, hut):
+    """Culture palette with the hut's group overrides, then the hut's own (colony.groups.<g>.palette, hut.palette)."""
+    groups = culture.get("colony", {}).get("groups", {})
+    roles = dict(culture["palette"])
+    roles.update(groups.get(_group(hut), {}).get("palette", {}))
+    roles.update(hut.get("palette", {}))
+    return roles
+
+
+def _features(culture, hut):
+    groups = culture.get("colony", {}).get("groups", {})
+    if "features" in hut:
+        return hut["features"]
+    return groups.get(_group(hut), {}).get("features", [])
 
 
 def _inv():
@@ -201,10 +222,12 @@ def build_hut(hut, culture):
     """Generate every level of one hut. Returns [(level, grid, hut_pos, missed)] on a shared footprint."""
     levels = []
     for lv, L in enumerate(hut["levels"], start=1):
-        pal = Palette(culture["palette"], seed=zlib.crc32(f"{hut['id']}{lv}".encode()))
+        pal = Palette(_roles(culture, hut), seed=zlib.crc32(f"{hut['id']}{lv}".encode()))
         g, _ = FORMS[L["form"]](L["params"], pal, culture)
         _strip(g)
         anchor = _anchor(g, L["form"], L["params"])
+        b = feat._wall_box(g, pal)
+        box = (b[0] - anchor[0], b[1] - anchor[1], b[2] - anchor[0], b[3] - anchor[1])
         for extra in L.get("annex", []):  # e.g. a watchtower beside the hall
             eg, _ = FORMS[extra["form"]](extra["params"], pal, culture)
             _strip(eg)
@@ -214,6 +237,7 @@ def build_hut(hut, culture):
         hx, hz = hut["hut_block_at"]          # relative to the anchor, same for every level
         keep = {(hx, hz), (hx, hz - 1), (hx, hz + 1), (hx - 1, hz), (hx + 1, hz)} | _door_lane(g)
         missed = furnish(g, _needs(L, pal), keep, f"{hut['id']}{lv}")
+        feat.apply(g, pal, _features(culture, hut), box, L["params"].get("wall_height", 3), culture)
         g.connect_fences()
         _fill_tes(g)
         levels.append((lv, g, missed))
@@ -345,11 +369,12 @@ def build_auto_hut(hut, culture, pack_dir):
         sizes = SHELL_SIZES[shell]
         done = None
         for si in range(floor, len(sizes)):
-            pal = Palette(culture["palette"], seed=zlib.crc32(f"{hut['id']}{lv}".encode()))
+            pal = Palette(_roles(culture, hut), seed=zlib.crc32(f"{hut['id']}{lv}".encode()))
             g, _ = FORMS[form](sizes[si], pal, culture)
             _strip(g)
             anchor = _anchor(g, form, sizes[si])
             g = _shift(g, -anchor[0], -anchor[1])
+            box = feat._wall_box(g, pal)
             hx, hz = 1, 0
             keep = {(hx, hz), (hx, hz - 1), (hx, hz + 1), (hx - 1, hz), (hx + 1, hz)} | _door_lane(g)
             outside = set(hut.get("outside", []))
@@ -379,9 +404,10 @@ def build_auto_hut(hut, culture, pack_dir):
             missed = furnish(g, inside_needs, keep | ({c for c in _annex_cells(g, hut_cells)} if ann else set()),
                              f"{hut['id']}{lv}")
             if not missed or si == len(sizes) - 1:
-                done = (lv, g, missed, si)
+                done = (lv, g, missed, si, box, pal)
                 break
-        lv, g, missed, floor = done
+        lv, g, missed, floor, box, pal = done
+        feat.apply(g, pal, _features(culture, hut), box, sizes[floor].get("wall_height", 3), culture)
         g.connect_fences()
         _fill_tes(g)
         levels.append((lv, g, missed))
@@ -406,7 +432,7 @@ def build_barracks(hut, culture, pack_dir):
         needs = [n for n in needs if n[0] != "bed" and n[1] != "minecolonies:blockhutbarrackstower"]
         racks = [n for n in needs if n[1] == "minecolonies:blockminecoloniesrack"]
         needs = [n for n in needs if n[1] != "minecolonies:blockminecoloniesrack"] + racks[k:]
-        pal = Palette(culture["palette"], seed=zlib.crc32(f"{hut['id']}{lv}".encode()))
+        pal = Palette(_roles(culture, hut), seed=zlib.crc32(f"{hut['id']}{lv}".encode()))
         params = {"width": 9, "length": 19, "wall_height": 4, "post_spacing": 4}
         g, _ = FORMS["long_hall"](params, pal, culture)
         _strip(g)
@@ -437,6 +463,7 @@ def build_barracks(hut, culture, pack_dir):
                     and x <= 0 and (z - (zs - anchor[1])) % 4 == 3}
         keep = {(1, 0), (1, -1), (1, 1), (0, 0), (2, 0)} | _door_lane(g) | corridor
         missed = furnish(g, needs, keep, f"{hut['id']}{lv}")
+        feat.apply(g, pal, _features(culture, hut), feat._wall_box(g, pal), params["wall_height"], culture)
         g.connect_fences()
         _fill_tes(g)
         levels.append((lv, g, missed))
