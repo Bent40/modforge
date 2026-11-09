@@ -100,6 +100,13 @@ LOOK = {
     "create:water_wheel": ("planks", "#8a6a3e", "#5b4226", "#a07c4a"),
     "minecraft:lightning_rod": ("flat", "#c06a4a", "#c06a4a", "#c06a4a"),
     "minecraft:dark_oak_door": ("planks", "#43301a", "#352512", "#523b20"),
+    "create:large_water_wheel": ("planks", "#8a6a3e", "#5b4226", "#a07c4a"),
+    "create:gearbox": ("planks", "#9a9a92", "#6a5a42", "#b0b0a8"),
+    "minecraft:chain": ("flat", "#3a3a40", "#3a3a40", "#3a3a40"),
+    "minecraft:blast_furnace": ("cobble", "#5a5a5e", "#3e3e42", "#7a7a7e"),
+    "minecraft:anvil": ("flat", "#444448", "#444448", "#555558"),
+    "minecraft:smithing_table": ("planks", "#3a2a2a", "#2a1e1e", "#5a4a4a"),
+    "minecraft:dark_oak_pressure_plate": ("planks", "#4a3219", "#3a2712", "#5a3e20"),
     GRASS: ("grass", "#6a9a3c", "#5a8632", "#86603f"),
     FLAME: ("flat", "#ffcf4a", "#ffcf4a", "#ffcf4a"),
 }
@@ -175,8 +182,8 @@ def _shape(name, props):
             x0, x1 = N - th, N
         return ((x0, y0, z0), (x1, y1, z1))
 
-    if name in ("create:cogwheel", "create:large_cogwheel", "create:water_wheel", "create:shaft"):
-        r = {"create:cogwheel": 4, "create:large_cogwheel": 10, "create:water_wheel": 12, "create:shaft": 1}[name]
+    if name in ("create:cogwheel", "create:large_cogwheel", "create:water_wheel", "create:large_water_wheel", "create:shaft"):
+        r = {"create:cogwheel": 4, "create:large_cogwheel": 10, "create:water_wheel": 12, "create:large_water_wheel": 20, "create:shaft": 1}[name]
         a, b = N // 2 - r, N // 2 + r
         th = (3, 5) if name != "create:shaft" else (0, N)
         ax = props.get("axis", "y")
@@ -185,6 +192,8 @@ def _shape(name, props):
         if ax == "x":
             return [(((th[0], a, a), (th[1], b, b)), name)]
         return [(((a, th[0], a), (b, th[1], b)), name)]
+    if name == "minecraft:chain":
+        return [(((3, 0, 3), (5, N, 5)), name)]
     if name == "minecraft:lantern":
         return [(((2, 0, 2), (6, 5, 6)), name), (((3, 1, 3), (5, 4, 5)), FLAME)]
     if name == "minecraft:lightning_rod":

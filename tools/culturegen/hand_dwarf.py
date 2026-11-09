@@ -141,6 +141,7 @@ def dwarf_hall(p, culture=None):
         _tower(g, xc, top, H)
     if p.get("wheel"):
         _water_wheel(g, -1, L // 2 + 2, H)
+        _line_shafts(g, W, L, H, L // 2 + 2)
     for i in range(p.get("chimneys", 0)):
         _chimney(g, W - 3 if i == 0 else 2, L, top)
     return g
@@ -199,13 +200,48 @@ def _tower(g, xc, roof_top, H):
 
 
 def _water_wheel(g, x, zc, H):
-    """Water wheel on the west wall driving a shaft into the hall, with a little race of water below."""
-    g.set(x - 1, 2, zc, P["wheel"], axis="x")
-    g.set(x, 2, zc, P["shaft"], axis="x")
-    for z in range(zc - 2, zc + 3):
-        g.set(x - 1, 0, z, "minecraft:water", level="0")
-        g.set(x - 2, 0, z, P["plinth"])
-        g.set(x - 3, 0, z, P["plinth"])
+    """Large Create water wheel (5x5) in a stone mill race on the west wall; its shaft runs through the wall
+    into a gearbox that feeds the hall's line shafts."""
+    wx = x - 2                                   # wheel plane, two blocks out from the skirt
+    for z in range(zc - 3, zc + 4):              # mill race: two deep, walled, under the wheel
+        for xx in (wx - 1, wx + 1):
+            for y in (-2, -1, 0):
+                g.set(xx, y, z, P["plinth"])
+        g.set(wx, -2, z, P["plinth"])
+        g.set(wx, -1, z, "minecraft:water", level="0")
+        g.set(wx, 0, z, "minecraft:water", level="0")
+    g.set(wx, 2, zc, "create:large_water_wheel", axis="x", extension="false", waterlogged="false")
+    for xx in range(wx + 1, 1):                  # through the skirt and the wall
+        g.set(xx, 2, zc, P["shaft"], axis="x")
+    g.set(1, 2, zc, "create:gearbox", axis="z")
+
+
+def _line_shafts(g, W, L, H, zc):
+    """Inside: from the gearbox a vertical shaft climbs to a line shaft running the length of the hall under the
+    roof, cogwheels on it every four blocks, and hanging lanterns down the nave."""
+    for y in range(3, H):
+        g.set(1, y, zc, P["shaft"], axis="y")
+    g.set(1, H, zc, P["cog"], axis="y")
+    for z in range(1, L - 1):
+        if z == zc:
+            continue
+        g.set(1, H, z, P["cog"] if z % 4 == 2 else P["shaft"], axis="z")
+    xc = W // 2
+    for z in range(3, L - 2, 4):
+        g.set(xc, H, z, "minecraft:chain", axis="y", waterlogged="false")
+        g.set(xc, H - 1, z, P["lantern"], hanging="true", waterlogged="false")
+    # feast tables with benches either side of the nave
+    for tx in (xc - 3, xc + 3):
+        for z in range(5, L - 5):
+            g.set(tx, 1, z, "minecraft:dark_oak_slab", type="top", waterlogged="false")
+            for bx, f in ((tx - 1, "west"), (tx + 1, "east")):
+                if 1 < bx < W - 2 and z % 3 != 0:
+                    g.set(bx, 1, z, "minecraft:dark_oak_stairs", facing=f, half="bottom", shape="straight",
+                          waterlogged="false")
+    # forge corner at the back: the hall is also the clan's first workshop
+    g.set(W - 2, 1, L - 2, "minecraft:blast_furnace", facing="west", lit="false")
+    g.set(W - 2, 1, L - 3, "minecraft:anvil", facing="north")
+    g.set(W - 3, 1, L - 2, "minecraft:smithing_table")
 
 
 def _chimney(g, x, L, roof_top):
