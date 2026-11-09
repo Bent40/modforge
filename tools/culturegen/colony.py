@@ -185,7 +185,7 @@ def furnish(g, needs, keep_clear, seed):
 
 
 def _needs(spec_level, pal):
-    bed = spec_level.get("bed_block", "minecraft:brown_bed")
+    bed = spec_level.get("bed_block") or (pal.main("bed") if "bed" in pal.roles else "minecraft:brown_bed")
     out = [("bed", bed, {})] * spec_level.get("beds", 0)
     out += [("stash", "minecolonies:blockstash", {"facing": "north"})] * spec_level.get("stash", 0)
     out += [("rack", "minecolonies:blockminecoloniesrack", {"variant": "blockrackemptysingle", "facing": "north"})] \
