@@ -141,7 +141,20 @@ def bell_spire(g, pal, box, H, culture):
     _banner_at(g, pal, xm, base + 3, zm - 2, "north", culture)
 
 
-FEATURES = {"chimney": chimney, "porch": porch, "palisade": palisade, "banners": banners,
+def gear_sign(g, pal, box, H, culture):
+    """Create gear train on the front wall above the door: a workshop of a machine culture (dwarf craft huts)."""
+    x0, z0, x1, z1 = box
+    dx = _door_x(g, z0)
+    if dx is None:
+        return
+    y = min(H - 1, 4)
+    g.set(dx, y, z0 - 1, "create:large_cogwheel", axis="z")
+    for ox in (-2, 2):
+        if g.get(dx + ox, y + 1, z0 - 1) is None:
+            g.set(dx + ox, y + 1, z0 - 1, "create:cogwheel", axis="z")
+
+
+FEATURES = {"gear_sign": gear_sign, "chimney": chimney, "porch": porch, "palisade": palisade, "banners": banners,
             "drying_rack": drying_rack, "log_pile": log_pile, "bell_spire": bell_spire}
 
 

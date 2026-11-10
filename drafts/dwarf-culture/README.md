@@ -21,3 +21,14 @@ wheel on the west wall.
 - Levels 1-5 for all three: `python3 -m tools.culturegen.build_dwarf` writes the pack (shared footprint per hut) and
   previews/levels/; sheets `previews/dwarf_{townhall,residence,blacksmith}_levels.png`.
 - Next: the generator for the long tail in the dwarf style.
+
+## Full pack (`pack/dwarf/`, 461 blueprints)
+
+    python3 -m tools.culturegen.reskin cultures/dwarf.yaml <pristine Goblin pack> OUT/dwarfpack
+    python3 -m tools.culturegen.colony cultures/dwarf.yaml OUT/col --source-pack OUT/dwarfpack
+    cp -r OUT/dwarfpack OUT/final && cp -r OUT/col/blueprints/* OUT/final/ && mv OUT/final/builder*.blueprint OUT/final/fundamentals/
+    python3 -m tools.culturegen.build_dwarf OUT/final OUT/previews    # the hand-built heroes overwrite the generated ones
+
+Pristine Goblin pack = isekai-chronicles 28fd014 `isekai_kingdoms_build/staging/blueprints/isekai_kingdoms/goblin`.
+Craft huts get a Create gear sign over the door (`gear_sign` feature). Sheet: `previews/dwarf_longtail_sheet.png`.
+Staged in isekai_kingdoms 1.5.12 (isekai-chronicles branch claude/project-thread-pzd85s), not built.

@@ -27,6 +27,10 @@ FAMILY_SHAPES = {
     "cobblestone": {"_stairs", "_slab", "_wall"},
     "mossy_cobblestone": {"_stairs", "_slab", "_wall"},
     "stone_brick": {"_stairs", "_slab", "_wall"},
+    "deepslate_brick": {"_stairs", "_slab", "_wall"},
+    "deepslate_tile": {"_stairs", "_slab", "_wall"},
+    "cobbled_deepslate": {"_stairs", "_slab", "_wall"},
+    "polished_andesite": {"_stairs", "_slab"},
 }
 
 
@@ -36,7 +40,9 @@ def _full(prefix):
 
 # targets that carry no blockstate properties (drop the source's, e.g. glazed terracotta `facing`)
 NO_PROPS = {"minecraft:" + n for n in ("mud_bricks", "packed_mud", "cobblestone", "mossy_cobblestone", "spruce_planks",
-                                        "coarse_dirt", "dirt", "air", "stone_bricks", "shroomlight", "hay_block")}
+                                        "coarse_dirt", "dirt", "air", "stone_bricks", "shroomlight", "hay_block",
+                                        "deepslate_bricks", "deepslate_tiles", "cobbled_deepslate", "polished_andesite",
+                                        "dark_oak_planks", "gray_terracotta")}
 
 
 class Rules:
