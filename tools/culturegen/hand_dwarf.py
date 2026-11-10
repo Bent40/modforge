@@ -239,7 +239,7 @@ def _line_shafts(g, W, L, H, zc):
     roof, cogwheels on it every four blocks, and hanging lanterns down the nave."""
     for y in range(3, H):
         g.set(1, y, zc, P["shaft"], axis="y")
-    g.set(1, H, zc, P["cog"], axis="y")
+    g.set(1, H, zc, "create:gearbox", axis="x")   # joins the vertical shaft to the line shaft (a y cog does not)
     for z in range(1, L - 1):
         if z == zc:
             continue
