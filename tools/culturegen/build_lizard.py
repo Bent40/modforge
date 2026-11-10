@@ -5,9 +5,11 @@
 import sys
 
 from .build_dwarf import build
-from .hand_lizard import lizard_dojo
+from .hand_lizard import lizard_dojo, lizard_hall, lizard_house
 
 HUTS = [
+    ("townhall", lizard_hall, {}, "minecolonies:blockhuttownhall", (13 // 2 + 2, 4, 2), "fundamentals"),
+    ("residence", lizard_house, {}, "minecolonies:blockhutcitizen", (4, 3, 2), "fundamentals"),
     ("combatacademy", lizard_dojo, {}, "minecolonies:blockhutcombatacademy", (13 // 2 + 2, 3), "military"),
 ]
 

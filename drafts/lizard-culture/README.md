@@ -10,5 +10,10 @@ eave corners, stone lanterns on the approach, water channels with lily pads.
 - Dojo (`lizard_dojo`, MineColonies combat academy): veranda on posts, mat ring with training dummies, weapon
   racks, shrine dais with banners. Levels: 1 hall; 2 dummies and stone lanterns; 3 raised clerestory and second
   roof; 4 weapon racks; 5 water channels. Sheet `previews/lizard_dojo_levels.png`.
-- `pack/lizard_preview/`: loose test pack (military/combatacademy1-5). Not pasted in game yet.
-- Next: town hall (stilt great hall), residence (stilt house), then the long tail via `cultures/lizardman.yaml`.
+- Town hall (`lizard_hall`): great hall on mangrove stilts over a pond, ramp, railed gallery, two-tier roof, chief's
+  seat and banners, war drum (note block) on the gallery. Levels: 1 hall; 2 gallery, banners; 3 upper roof tier;
+  4 drum, stone lanterns; 5 water channels.
+- Residence (`lizard_house`): stilt house over a fish pond with a porch and fish rack; level n = n beds (3+ adds a
+  stilted side room).
+- `pack/lizard_preview/`: loose test pack (townhall, residence, combatacademy 1-5). Not pasted in game yet.
+- Next: the long tail via `cultures/lizardman.yaml` (reskin + colony.py) in these materials.

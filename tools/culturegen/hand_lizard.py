@@ -439,7 +439,6 @@ def lizard_house(p=None, culture=None):
                 g.set(x, y, z, P["post"], axis="y")
         g.cells[(W - 1, deck + 1, L // 2)] = ("minecraft:air", {})
         g.cells[(W - 1, deck + 2, L // 2)] = ("minecraft:air", {})
-        g.set(W - 1, deck + 1, L // 2 - 1, "minecraft:smoker", facing="west", lit="false") if False else None
         for i in range(lv - 2):
             _bed(g, SX1 - 1, deck + 1, SZ0 + 1 + i * 2 if i < 2 else SZ0 + 1, facing="west") if i < 2 else \
                 _bed(g, SX0 + 1, deck + 1, SZ1 - 1, facing="north")

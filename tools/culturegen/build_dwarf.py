@@ -23,15 +23,18 @@ HUTS = [
 
 def build(out, pdir=None, huts=None, prefix="dwarf"):
     report = []
-    for hid, fn, par, hut, (hx, hz), sub in (huts or HUTS):
+    for hid, fn, par, hut, pos, sub in (huts or HUTS):
+        hx, hz = pos[0], pos[-1]
+        hy = pos[1] if len(pos) == 3 else 1      # (x, z) = ground floor; (x, y, z) for raised floors
         levels = []
         for lv in range(1, 6):
             g = fn(dict(par, level=lv))
-            c = g.get(hx, 1, hz)
+            c = g.get(hx, hy, hz)
             assert c is None or c[0] == "minecraft:air", f"{hid}{lv}: hut spot taken by {c}"
             levels.append((lv, g, []))
         os.makedirs(os.path.join(out, sub), exist_ok=True)
         for lv, g, hp, _ in _share_footprint(levels, (hx, hz)):
+            hp = (hp[0], hp[1] + hy - 1, hp[2])
             g.set(*hp, hut, facing="north")
             name = f"{hid}{lv}.blueprint"
             root = bp.from_grid(g, name, hut, hp, required_mods=("minecolonies", "create"), architects=["culturegen"])
