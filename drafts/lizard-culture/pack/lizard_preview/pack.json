@@ -1,0 +1,14 @@
+{
+  "icon": "icon.png",
+  "name": "Lizardman Preview",
+  "authors": [
+    "culturegen"
+  ],
+  "desc": "Hand-designed lizardman dojo, test pack",
+  "mods": [
+    "structurize",
+    "minecolonies"
+  ],
+  "version": "1",
+  "pack-format": "1"
+}

@@ -112,6 +112,28 @@ LOOK = {
 }
 
 
+LOOK.update({                                       # lizardman marsh palette
+    "minecraft:mud_brick_stairs": LOOK["minecraft:mud_bricks"],
+    "minecraft:mud_brick_wall": LOOK["minecraft:mud_bricks"],
+    "minecraft:bamboo_mosaic": ("planks", "#c9b34e", "#a8923a", "#d8c260"),
+    "minecraft:mangrove_log": ("log", "#5a4a35", "#3f3324", "#6b5a42"),
+    "minecraft:stripped_mangrove_log": ("log", "#7a3530", "#5f2824", "#8c423c"),
+    "minecraft:mangrove_planks": ("planks", "#773634", "#5c2826", "#8a4442"),
+    "minecraft:mangrove_fence": ("planks", "#773634", "#5c2826", "#8a4442"),
+    "minecraft:mangrove_door": ("planks", "#6e3230", "#552624", "#823e3c"),
+    "minecraft:bamboo_trapdoor": ("planks", "#c4ad46", "#9e8a34", "#d4be58"),
+    "minecraft:bamboo_fence": ("planks", "#c4ad46", "#9e8a34", "#d4be58"),
+    "minecraft:dark_prismarine": ("bricks", "#335b4c", "#24443a", "#3f6c5c"),
+    "minecraft:dark_prismarine_stairs": ("bricks", "#335b4c", "#24443a", "#3f6c5c"),
+    "minecraft:dark_prismarine_slab": ("bricks", "#335b4c", "#24443a", "#3f6c5c"),
+    "minecraft:waxed_oxidized_cut_copper": ("bricks", "#52a284", "#3f8268", "#62b496"),
+    "minecraft:green_carpet": ("noise", "#4f6b1f", "#435c19", "#5a7a24"),
+    "minecraft:lily_pad": ("noise", "#2f7a25", "#25621d", "#3a8a2e"),
+    "minecraft:carved_pumpkin": ("noise", "#c87412", "#a85f0e", "#d8861e"),
+    "minecraft:decorated_pot": ("noise", "#8c4b35", "#6f3a29", "#9c5a42"),
+    "minecraft:green_wall_banner": ("noise", "#4f6b1f", "#435c19", "#5a7a24"),
+})
+
 def _hex(h):
     return np.array([int(h[i:i + 2], 16) for i in (1, 3, 5)], dtype=float)
 

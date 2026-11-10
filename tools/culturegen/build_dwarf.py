@@ -21,9 +21,9 @@ HUTS = [
 ]
 
 
-def build(out, pdir=None):
+def build(out, pdir=None, huts=None, prefix="dwarf"):
     report = []
-    for hid, fn, par, hut, (hx, hz), sub in HUTS:
+    for hid, fn, par, hut, (hx, hz), sub in (huts or HUTS):
         levels = []
         for lv in range(1, 6):
             g = fn(dict(par, level=lv))
@@ -42,7 +42,7 @@ def build(out, pdir=None):
             if pdir:
                 from .render import render
                 os.makedirs(pdir, exist_ok=True)
-                render(g, os.path.join(pdir, f"dwarf_{hid}{lv}_front.png"), scale=4)
+                render(g, os.path.join(pdir, f"{prefix}_{hid}{lv}_front.png"), scale=4)
     return report
 
 
