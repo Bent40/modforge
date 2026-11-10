@@ -17,3 +17,9 @@ eave corners, stone lanterns on the approach, water channels with lily pads.
   stilted side room).
 - `pack/lizard_preview/`: loose test pack (townhall, residence, combatacademy 1-5). Not pasted in game yet.
 - Next: the long tail via `cultures/lizardman.yaml` (reskin + colony.py) in these materials.
+
+## Full pack (`pack/lizardman/`, 461 blueprints)
+
+Same recipe as the dwarf pack (drafts/dwarf-culture/README.md) with `cultures/lizardman.yaml` and
+`python3 -m tools.culturegen.build_lizard OUT/final OUT/previews` for the heroes. Sheet `previews/lizard_longtail_sheet.png`.
+Channel ends are walled (an offline check found the corner water open to terrain). Not staged in a jar yet.

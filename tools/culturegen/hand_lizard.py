@@ -113,6 +113,11 @@ def _channel(g, x, z0, z1):
         g.set(x + 1, 0, z, P["plinth"]) if g.get(x + 1, 0, z) is None else None
         if z % 3 == 1:
             g.set(x, 1, z, "minecraft:lily_pad")
+    for z in (z0 - 1, z1 + 1):                  # close both ends so the water can't spill on open ground
+        for xx in (x - 1, x, x + 1):
+            g.set(xx, -1, z, P["plinth"])
+            if g.get(xx, 0, z) is None or g.get(xx, 0, z)[0] == "minecraft:air":
+                g.set(xx, 0, z, P["plinth"])
 
 
 def _stone_lantern(g, x, z):
@@ -398,6 +403,7 @@ def lizard_house(p=None, culture=None):
         for z in (-2, -1):
             g.set(x, deck, z, P["planks"])
     for x in (0, W - 1):
+        g.set(x, -1, -2, P["plinth"])            # footing under the porch posts
         for y in range(0, deck):
             g.set(x, y, -2, P["post"], axis="y")
         g.set(x, deck + 1, -2, P["fence"], **FENCE)
