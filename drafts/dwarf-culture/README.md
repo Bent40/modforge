@@ -18,4 +18,6 @@ wheel on the west wall.
 - Town hall water wheel: cistern and chute drop a waterfall down the rim (Create wheels need flowing water).
 - Pack now holds townhall1, residence1, blacksmith1. Untested in game: fluid_tank, fluid_pipe, depot,
   mechanical_press, hand_crank, and whether the wheel spins.
-- Next: levels 1-5 for these three, then the generator for the long tail.
+- Levels 1-5 for all three: `python3 -m tools.culturegen.build_dwarf` writes the pack (shared footprint per hut) and
+  previews/levels/; sheets `previews/dwarf_{townhall,residence,blacksmith}_levels.png`.
+- Next: the generator for the long tail in the dwarf style.

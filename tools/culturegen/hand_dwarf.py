@@ -76,8 +76,11 @@ def _gable_roof(g, x0, x1, z0, z1, ybase, overhang=1):
 
 
 def dwarf_hall(p, culture=None):
-    """The dwarf town hall. p: width (odd), length, wall_height, tower (bool), wheel (bool), chimneys (0-2)."""
+    """The dwarf town hall. p: width (odd), length, wall_height, tower (bool), wheel (bool), chimneys (0-2),
+    level (1-5, default 5): 1 bare hall with feast tables; 2 forge corner, cog train over the door, one chimney;
+    3 water wheel and line shafts, second chimney; 4 tower; 5 clock face, lightning rod, brass floor inlay."""
     W, L, H = p["width"], p["length"], p["wall_height"]
+    lv = p.get("level", 5)
     g = Grid()
     xc = W // 2
     pillars_z = set(range(0, L, 4)) | {L - 1}
@@ -94,7 +97,7 @@ def dwarf_hall(p, culture=None):
         for z in range(L):
             edge = x in (0, W - 1) or z in (0, L - 1)
             if not edge:
-                inlay = (x == xc or z == L // 2) and x not in (1, W - 2)
+                inlay = lv >= 5 and (x == xc or z == L // 2) and x not in (1, W - 2)
                 g.set(x, 0, z, P["floor_inlay"] if inlay else P["floor"])
                 for y in range(1, H + 2):
                     g.air(x, y, z)
@@ -134,20 +137,22 @@ def dwarf_hall(p, culture=None):
         g.set(x, 3, -1, P["lantern"], hanging="false", waterlogged="false")
     # cog train above the door: shaft, big gear, small gears
     gy = H - 1
-    g.set(xc, gy, -1, P["big_cog"], axis="z")
-    for dx in (-2, 2):
-        g.set(xc + dx, gy + 1, -1, P["cog"], axis="z")
-    if p.get("tower"):
-        _tower(g, xc, top, H)
-    if p.get("wheel"):
+    if lv >= 2:
+        g.set(xc, gy, -1, P["big_cog"], axis="z")
+        for dx in (-2, 2):
+            g.set(xc + dx, gy + 1, -1, P["cog"], axis="z")
+    if p.get("tower") and lv >= 4:
+        _tower(g, xc, top, H, clock=lv >= 5)
+    if p.get("wheel") and lv >= 3:
         _water_wheel(g, -1, L // 2 + 2, H)
         _line_shafts(g, W, L, H, L // 2 + 2)
-    for i in range(p.get("chimneys", 0)):
+    _hall_furnish(g, W, L, H, lv)
+    for i in range(min(p.get("chimneys", 0), max(0, lv - 1))):
         _chimney(g, W - 3 if i == 0 else 2, L, top)
     return g
 
 
-def _tower(g, xc, roof_top, H):
+def _tower(g, xc, roof_top, H, clock=True):
     """Clock tower on the front: 5x5, rises well above the ridge, gear clock face, copper spire."""
     z0, z1 = -4, 0
     x0, x1 = xc - 2, xc + 2
@@ -181,9 +186,9 @@ def _tower(g, xc, roof_top, H):
         _stair(g, x, 0, z0 - 1, "south", block=P["plinth_stairs"])
     for x in (xc - 2, xc + 1):
         g.set(x, 3, z0 - 1, P["lantern"], hanging="false", waterlogged="false")
-    # gear clock face high on the front
-    g.set(xc, th - 3, z0 - 1, P["big_cog"], axis="z")
-    g.set(xc, th - 3, z0, P["shaft"], axis="z")
+    if clock:  # gear clock face high on the front
+        g.set(xc, th - 3, z0 - 1, P["big_cog"], axis="z")
+        g.set(xc, th - 3, z0, P["shaft"], axis="z")
     # stepped copper spire
     for k in range(3):
         for x in range(x0 - 1 + k, x1 + 2 - k):
@@ -196,7 +201,8 @@ def _tower(g, xc, roof_top, H):
                 else:
                     g.set(x, th + 1 + k, z, P["roof_slab"], type="bottom", waterlogged="false")
     g.set(xc, th + 4, (z0 + z1) // 2, P["ridge"])
-    g.set(xc, th + 5, (z0 + z1) // 2, "minecraft:lightning_rod", facing="up", powered="false", waterlogged="false")
+    if clock:
+        g.set(xc, th + 5, (z0 + z1) // 2, "minecraft:lightning_rod", facing="up", powered="false", waterlogged="false")
 
 
 def _water_wheel(g, x, zc, H):
@@ -238,6 +244,10 @@ def _line_shafts(g, W, L, H, zc):
         if z == zc:
             continue
         g.set(1, H, z, P["cog"] if z % 4 == 2 else P["shaft"], axis="z")
+
+
+def _hall_furnish(g, W, L, H, lv):
+    """Hanging lanterns down the nave and feast tables at every level; the forge corner from level 2."""
     xc = W // 2
     for z in range(3, L - 2, 4):
         g.set(xc, H, z, "minecraft:chain", axis="y", waterlogged="false")
@@ -250,6 +260,8 @@ def _line_shafts(g, W, L, H, zc):
                 if 1 < bx < W - 2 and z % 3 != 0:
                     g.set(bx, 1, z, "minecraft:dark_oak_stairs", facing=f, half="bottom", shape="straight",
                           waterlogged="false")
+    if lv < 2:
+        return
     # forge corner at the back: the hall is also the clan's first workshop
     g.set(W - 2, 1, L - 2, "minecraft:blast_furnace", facing="west", lit="false")
     g.set(W - 2, 1, L - 3, "minecraft:anvil", facing="north")
@@ -276,8 +288,11 @@ def _bed(g, x, y, z, facing="north", colour="gray"):
 def dwarf_house(p, culture=None):
     """Dwarf residence: a dug-in deepslate ground storey, a jettied andesite upper storey on casing posts with
     corbels, steep tile roof with a copper ridge, a brick chimney, and a small copper water tank on a stand.
-    p: width (odd, >= 9), length (>= 11), beds (1-4)."""
+    p: width (odd, >= 9), length (>= 11), level (1-5, default 5) = beds. Level 1 is the ground storey alone under
+    its roof with one bed; 2 adds the jettied upper storey and stair; 3 the chimney; 4 the water tank; 5 the cog sign
+    and porch lanterns, with a fifth bed back downstairs."""
     W, L = p.get("width", 9), p.get("length", 11)
+    lv = p.get("level", 5)
     g = Grid()
     xc = W // 2
     LO, UP0, UP1 = 4, 6, 9                       # lower walls y1..4, upper floor y5, upper walls y6..9
@@ -306,6 +321,21 @@ def dwarf_house(p, culture=None):
                 f = "east" if x == -1 else "west" if x == W else "south" if z == -1 else "north"
                 if not (z == -1 and x in (xc, xc - 1, xc + 1)):
                     _stair(g, x, 0, z, f, block=P["plinth_stairs"])
+    if lv == 1:
+        for x in range(W):
+            for z in range(L):
+                if x in (0, W - 1) or z in (0, L - 1):
+                    g.set(x, LO + 1, z, P["band"])
+        top = _gable_roof(g, 0, W - 1, 0, L - 1, LO + 2)
+        g.set(xc, LO + 3, 0, P["window"])
+        g.set(xc, LO + 3, L - 1, P["window"])
+        _door(g, xc, 0)
+        _stair(g, xc, 0, -1, "south", block=P["plinth_stairs"])
+        g.set(xc - 2, 3, -1, P["lantern"], hanging="false", waterlogged="false")
+        _house_kitchen(g, W, L, xc)
+        _bed(g, 2, 1, 2, facing="west")
+        g.set(1, LO, L // 2, P["lantern"], hanging="true", waterlogged="false")
+        return g
     # upper floor (dark oak boards) incl. the jetty, corbels under the jetty
     for x in range(W):
         for z in range(zf, L):
@@ -335,8 +365,46 @@ def dwarf_house(p, culture=None):
     _door(g, xc, 0)
     _stair(g, xc, 0, -1, "south", block=P["plinth_stairs"])
     g.set(xc - 2, 3, -1, P["lantern"], hanging="false", waterlogged="false")
-    g.set(xc, LO + 1, zf - 1, P["cog"], axis="z")
-    # inside, ground: kitchen along the back, table in the middle, stair up the east side
+    if lv >= 5:
+        g.set(xc, LO + 1, zf - 1, P["cog"], axis="z")
+        g.set(xc + 2, 3, -1, P["lantern"], hanging="false", waterlogged="false")
+        _bed(g, 2, 1, 2, facing="west")
+    _house_kitchen(g, W, L, xc)
+    sx = W - 2
+    for k in range(4):                           # straight stair: y1..4 rising to the upper floor at y5
+        g.set(sx, 1 + k, 2 + k, "minecraft:dark_oak_stairs", facing="south", half="bottom", shape="straight",
+              waterlogged="false")
+    for z in range(2, 6):
+        g.cells[(sx, LO + 1, z)] = ("minecraft:air", {})   # stairwell opening
+    for z in (3, 4):
+        g.set(sx - 1, LO + 2, z, "minecraft:dark_oak_fence", north="false", south="false", east="false",
+              west="false", waterlogged="false")
+    g.set(1, LO, L // 2, P["lantern"], hanging="true", waterlogged="false")
+    # upstairs: beds against the west wall, chests at their feet, a lantern
+    for i in range(min(lv, 4)):
+        bz = L - 2 - i * 2
+        _bed(g, 2, UP0, bz, facing="west")
+        g.set(3, UP0, bz, "minecraft:chest", facing="east", type="single", waterlogged="false")
+    g.set(xc, UP1, L // 2, P["lantern"], hanging="true", waterlogged="false")
+    if lv >= 3:  # chimney on the back wall
+        for y in range(0, top + 2):
+            g.set(xc, y, L, P["chimney"])
+            g.set(xc + 1, y, L, P["chimney"])
+        g.set(xc, top + 2, L, "minecraft:campfire", facing="south", lit="true", signal_fire="false",
+              waterlogged="false")
+    if lv >= 4:  # copper water tank on a casing stand by the west wall, piped into the kitchen
+        tx, tz = -2, L - 3
+        for y in range(0, 3):
+            g.set(tx, y, tz, P["pillar"])
+        g.set(tx, 3, tz, "create:fluid_tank", bottom="true", top="false", shape="window")
+        g.set(tx, 4, tz, "create:fluid_tank", bottom="false", top="true", shape="window")
+        g.set(-1, 3, tz, "create:fluid_pipe", east="true", west="true", north="false", south="false", up="false",
+              down="false", waterlogged="false")
+    return g
+
+
+def _house_kitchen(g, W, L, xc):
+    """Ground floor of the dwarf house: kitchen along the back wall, a table with two stools in the middle."""
     g.set(1, 1, L - 2, "minecraft:smoker", facing="north", lit="false")
     g.set(2, 1, L - 2, "minecraft:barrel", facing="up", open="false")
     g.set(3, 1, L - 2, "minecraft:crafting_table")
@@ -346,54 +414,23 @@ def dwarf_house(p, culture=None):
           waterlogged="false")
     g.set(xc - 1, 1, L // 2 + 1, "minecraft:dark_oak_stairs", facing="north", half="bottom", shape="straight",
           waterlogged="false")
-    sx = W - 2
-    for k in range(4):                           # straight stair: y1..4 rising to the upper floor at y5
-        g.set(sx, 1 + k, 2 + k, "minecraft:dark_oak_stairs", facing="south", half="bottom", shape="straight",
-              waterlogged="false")
-    for z in range(2, 6):
-        g.cells[(sx, LO + 1, z)] = ("minecraft:air", {})   # stairwell opening
-    g.set(sx - 1, LO + 2, 3, "minecraft:dark_oak_fence", north="false", south="false", east="false", west="false",
-          waterlogged="false")
-    g.set(sx - 1, LO + 2, 4, "minecraft:dark_oak_fence", north="false", south="false", east="false", west="false",
-          waterlogged="false")
-    g.set(1, LO, L // 2, P["lantern"], hanging="true", waterlogged="false")
-    # upstairs: beds against the west wall, chests at their feet, a lantern
-    beds = p.get("beds", 2)
-    for i in range(beds):
-        bz = L - 2 - i * 2
-        if bz < 2:
-            break
-        _bed(g, 2, UP0, bz, facing="west")
-        g.set(3, UP0, bz, "minecraft:chest", facing="east", type="single", waterlogged="false")
-    g.set(xc, UP1, L // 2, P["lantern"], hanging="true", waterlogged="false")
-    # chimney on the back wall, fireplace below
-    for y in range(0, top + 2):
-        g.set(xc, y, L, P["chimney"])
-        g.set(xc + 1, y, L, P["chimney"])
-    g.set(xc, top + 2, L, "minecraft:campfire", facing="south", lit="true", signal_fire="false", waterlogged="false")
-    # copper water tank on a casing stand by the west wall, piped into the kitchen
-    tx, tz = -2, L - 3
-    for y in range(0, 3):
-        g.set(tx, y, tz, P["pillar"])
-    g.set(tx, 3, tz, "create:fluid_tank", bottom="true", top="false", shape="window")
-    g.set(tx, 4, tz, "create:fluid_tank", bottom="false", top="true", shape="window")
-    g.set(-1, 3, tz, "create:fluid_pipe", east="true", west="true", north="false", south="false", up="false",
-          down="false", waterlogged="false")
-    return g
 
 
 def dwarf_smithy(p, culture=None):
     """Dwarf blacksmith: a forge hall with a wide open front under a stone lintel, a 3x3 brick forge stack
     through the roof with the fire visible inside, a Create press over a depot turned by a hand crank, anvil,
-    grindstone, quench cauldron, and an ore-and-coal lean-to along the west side. p: width (odd), length."""
+    grindstone, quench cauldron, and an ore-and-coal lean-to along the west side. p: width (odd), length, level (1-5):
+    1 forge hall, stack, one blast furnace, anvil; 2 second furnace, grindstone, quench; 3 ore lean-to; 4 Create press
+    with hand crank; 5 cog sign over the door and the brass floor inlay."""
     W, L, H = p.get("width", 11), p.get("length", 9), 6
+    lv = p.get("level", 5)
     g = Grid()
     xc = W // 2
     for x in range(W):
         for z in range(L):
             edge = x in (0, W - 1) or z in (0, L - 1)
             if not edge:
-                g.set(x, 0, z, P["floor_inlay"] if (x, z) == (xc, L // 2) else P["floor"])
+                g.set(x, 0, z, P["floor_inlay"] if lv >= 5 and (x, z) == (xc, L // 2) else P["floor"])
                 for y in range(1, H + 2):
                     g.air(x, y, z)
                 continue
@@ -423,7 +460,8 @@ def dwarf_smithy(p, culture=None):
         g.set(x, 0, -1, P["plinth"])
     _stair(g, xc - 2, 4, 0, "east", half="top", block=P["plinth_stairs"])
     _stair(g, xc + 2, 4, 0, "west", half="top", block=P["plinth_stairs"])
-    g.set(xc, 6, -1, P["big_cog"], axis="z")
+    if lv >= 5:
+        g.set(xc, 6, -1, P["big_cog"], axis="z")
     top = _gable_roof(g, 0, W - 1, 0, L - 1, H + 2)
     g.set(xc, H + 4, L - 1, P["window"])
     # forge stack: 3x3 bricks on the back wall, hollow flue, fire seen through an opening
@@ -445,23 +483,28 @@ def dwarf_smithy(p, culture=None):
     for x in range(fx - 1, fx + 2):
         g.set(x, top + 3, L - 1, P["plinth_stairs"], facing="south", half="bottom", shape="straight", waterlogged="false")
     g.set(fx - 1, 1, L - 2, "minecraft:blast_furnace", facing="east", lit="false")
-    g.set(fx + 1, 1, L - 2, "minecraft:blast_furnace", facing="west", lit="false")
+    if lv >= 2:
+        g.set(fx + 1, 1, L - 2, "minecraft:blast_furnace", facing="west", lit="false")
     # work floor
     g.set(xc, 1, L // 2 + 1, "minecraft:anvil", facing="east")
     g.set(xc + 1, 1, L - 2, "minecraft:smithing_table")
-    g.set(xc - 1, 1, L // 2 + 1, "minecraft:water_cauldron", level="3")
-    g.set(1, 1, 2, "minecraft:grindstone", face="floor", facing="east")
+    if lv >= 2:
+        g.set(xc - 1, 1, L // 2 + 1, "minecraft:water_cauldron", level="3")
+        g.set(1, 1, 2, "minecraft:grindstone", face="floor", facing="east")
     g.set(1, 1, 1, "minecraft:barrel", facing="up", open="false")
-    # Create press over a depot on the east side, turned by a hand crank through the wall
-    px, pz = W - 3, L // 2
-    g.set(px, 1, pz, "create:depot")
-    g.set(px, 3, pz, "create:mechanical_press", facing="west")
-    g.set(px + 1, 3, pz, "create:shaft", axis="x")
-    g.set(W, 3, pz, "create:hand_crank", facing="east", powered="false", waterlogged="false")
-    g.cells[(W - 1, 3, pz)] = ("create:shaft", {"axis": "x"})
+    if lv >= 4:
+        # Create press over a depot on the east side, turned by a hand crank through the wall
+        px, pz = W - 3, L // 2
+        g.set(px, 1, pz, "create:depot")
+        g.set(px, 3, pz, "create:mechanical_press", facing="west")
+        g.set(px + 1, 3, pz, "create:shaft", axis="x")
+        g.set(W, 3, pz, "create:hand_crank", facing="east", powered="false", waterlogged="false")
+        g.cells[(W - 1, 3, pz)] = ("create:shaft", {"axis": "x"})
     for z in (2, L - 3):
         g.set(xc, H, z, "minecraft:chain", axis="y", waterlogged="false")
         g.set(xc, H - 1, z, P["lantern"], hanging="true", waterlogged="false")
+    if lv < 3:
+        return g
     # lean-to on the west: casing posts, tile slab roof, coal and ore stock
     for z in range(1, L - 1):
         for x in (-3, -2):
